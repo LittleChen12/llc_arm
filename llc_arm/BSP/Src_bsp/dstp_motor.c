@@ -315,7 +315,7 @@ void Set_Follow_Torque(uint16_t id,uint8_t echo,uint8_t sync,float Targe_Torque)
 }
 
 /**
- * @brief  读取实际位置
+ * @brief  读取实际位置（已经验证）
  * 
  * 此函数负责读取电机实际位置 控制数据字节长度：0 功能码： 0x32
  * 
@@ -324,6 +324,93 @@ void Set_Follow_Torque(uint16_t id,uint8_t echo,uint8_t sync,float Targe_Torque)
 void Read_Actual_Position(uint16_t id)
 {
 		fdcanx_send_data(id,NULL,0,0x32);
+}
+
+/**
+ * @brief  读取实际速度（已经验证）
+ * 
+ * 此函数负责读取电机实际速度 控制数据字节长度：0 功能码： 0x33
+ * 
+ * @param  id：电机id号  
+ */
+void Read_Actual_Speed(uint16_t id)
+{
+		fdcanx_send_data(id,NULL,0,0x33);
+}
+
+/**
+ * @brief  跟随速度模式(已经验证）
+ * 
+ * 此函数负责电机的周期速度运动 控制数据字节长度：6 功能码：0x28
+ * 
+ * @param  id：电机id号 echo:数据接收 sync：电机同步功能 
+ */
+void Follow_Speed_Mode(uint16_t id,uint8_t echo, uint8_t sync, float Follow_Speed)
+{
+    uint8_t data[6];
+    // 设置数据字段
+    data[0] = echo;
+    data[1] = sync;
+
+    // 将 float32 转换为小端模式字节数组
+    uint8_t* SpeedBytes = (uint8_t*)&Follow_Speed;
+    data[2] = SpeedBytes[0];
+    data[3] = SpeedBytes[1];
+    data[4] = SpeedBytes[2];
+    data[5] = SpeedBytes[3];		
+		
+		//数据发送
+		fdcanx_send_data(id,data,6,0x28);
+}
+
+/**
+ * @brief  设置轮廓速度(已经验证）
+ * 
+ * 此函数负责设置电机速度 控制数据字节长度：6 功能码： 0x23
+ * 
+ * @param  id：电机id号 echo:数据接收 sync：电机同步功能 Targe_Torque：目标转矩
+ */
+void Set_Contour_Speed(uint16_t id,uint8_t echo, uint8_t sync, float Targe_Speed)
+{
+	  uint8_t data[6];
+    // 设置数据字段
+    data[0] = echo;
+    data[1] = sync;
+
+    // 将 float32 转换为小端模式字节数组
+    uint8_t* SpeedBytes = (uint8_t*)&Targe_Speed;
+    data[2] = SpeedBytes[0];
+    data[3] = SpeedBytes[1];
+    data[4] = SpeedBytes[2];
+    data[5] = SpeedBytes[3];		
+		
+		//数据发送
+		fdcanx_send_data(id,data,6,0x23);
+}
+
+/**
+ * @brief  设置轮廓位置(已经验证）
+ * 
+ * 此函数负责设置电机位置 控制数据字节长度：6 功能码： 0x25
+ * 
+ * @param  id：电机id号 echo:数据接收 sync：电机同步功能 Targe_Torque：目标转矩
+ */
+void Set_Contour_Position(uint16_t id,uint8_t echo, uint8_t sync, float Targe_Position)
+{
+	  uint8_t data[6];
+    // 设置数据字段
+    data[0] = echo;
+    data[1] = sync;
+
+    // 将 float32 转换为小端模式字节数组
+    uint8_t* PositionBytes = (uint8_t*)&Targe_Position;
+    data[2] = PositionBytes[0];
+    data[3] = PositionBytes[1];
+    data[4] = PositionBytes[2];
+    data[5] = PositionBytes[3];		
+		
+		//数据发送
+		fdcanx_send_data(id,data,6,0x25);
 }
 	
 

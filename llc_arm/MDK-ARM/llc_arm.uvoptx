@@ -319,7 +319,12 @@
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>time_base</ItemText>
+          <ItemText>speed_test,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>read_data</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

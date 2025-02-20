@@ -2,9 +2,25 @@
 #define __DSTP_MOTOR__H
 
 //头文件包含
+
 #include "fdcan.h"
 
+//自定义结构体
+
+/* Dstp_Motor_Send为dstp电机驱动器控制变量结构体 */
+typedef struct
+{
+	float acc;
+	float speed;
+	float position;
+	float torque;
+}Dstp_Motor_Send;
+extern Dstp_Motor_Send dstp_motor_send[6];
+
+
+
 //自定义函数
+
 void fdcanx_send_data(uint16_t id, uint8_t *data, uint32_t len, uint8_t func_code);
 void Motor_origin_setting(uint16_t id);
 void Motor_start(uint16_t id);
@@ -77,5 +93,43 @@ void Set_Follow_Torque(uint16_t id,uint8_t echo,uint8_t sync,float Targe_Torque)
  * @param  id：电机id号  
  */
 void Read_Actual_Position(uint16_t id);
+
+/**
+ * @brief  读取实际速度（已经验证）
+ * 
+ * 此函数负责读取电机实际速度 控制数据字节长度：0 功能码： 0x33
+ * 
+ * @param  id：电机id号  
+ */
+void Read_Actual_Speed(uint16_t id);
+	
+
+/**
+ * @brief  跟随位置模式
+ * 
+ * 此函数负责电机的周期位置运动 控制数据字节长度：6 功能码：0x28
+ * 
+ * @param  id：电机id号 echo:数据接收 sync：电机同步功能 
+ */
+void Follow_Speed_Mode(uint16_t id,uint8_t echo, uint8_t sync, float Follow_Speed);
+
+
+/**
+ * @brief  设置轮廓速度
+ * 
+ * 此函数负责设置电机转矩 控制数据字节长度：6 功能码： 0x23
+ * 
+ * @param  id：电机id号 echo:数据接收 sync：电机同步功能 Targe_Torque：目标转矩
+ */
+void Set_Contour_Speed(uint16_t id,uint8_t echo, uint8_t sync, float Targe_Speed);
+
+/**
+ * @brief  设置轮廓位置
+ * 
+ * 此函数负责设置电机转矩 控制数据字节长度：6 功能码： 0x25
+ * 
+ * @param  id：电机id号 echo:数据接收 sync：电机同步功能 Targe_Torque：目标转矩
+ */
+void Set_Contour_Position(uint16_t id,uint8_t echo, uint8_t sync, float Targe_Position);
 
 #endif

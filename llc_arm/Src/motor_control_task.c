@@ -7,28 +7,39 @@ float acc_test = 0.0f;
 long int tick;
 float time_base;
 
+
+Dstp_Motor_Send dstp_motor_send[6];
+
 void Motor_Control_start(void *argument)
 {
-	Motor_origin_setting(1);//设定原点
+	Motor_origin_setting(3);//设定原点
 	osDelay(10);
-	Motor_mode_setting(1,0x04);//选择控制模式
+	Motor_mode_setting(3,0x06);//选择控制模式
 	osDelay(10);
-	Motor_stop(1);
+	Motor_stop(3);
 	osDelay(100);
-	Motor_start(1);//启动电机
+	Motor_start(3);//启动电机
 	osDelay(1000);
   for(;;)
   {
-		if(time_base <= 0.1f)
+		if(time_base<=2.0f)
 		{
-			Torque_test = 0.05f+0.01f*time_base;
-			Set_Follow_Torque(1,0x06,0,Torque_test);
+			position_test = 0.5*1*time_base*time_base;
 		}
-		else if(time_base == 10.0f)
+		else
 		{
-			Quick_Stop_Motor(1);
+			position_test = 2.0f + 2.0f*(time_base-2.0f);
 		}
-		Read_Actual_Position(1);
+		if(position_test<60)
+		{
+			Follow_Position_Mode(3,0,0,position_test);
+		}
+//		Set_Contour_Position(1,0x06,0,position_test);
+//		else if(time_base == 10.0f)
+//		{
+//			Quick_Stop_Motor(1);
+//		}
+		//Read_Actual_Position(1);
 		
 		//时间1ms
 		time_base = ((tick++) * 0.001f);

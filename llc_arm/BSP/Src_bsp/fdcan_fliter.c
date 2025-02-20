@@ -97,91 +97,86 @@ uint8_t fdcanx_receive(FDCAN_HandleTypeDef *hfdcan, uint16_t *rec_id, uint8_t *b
 FDCAN_RxHeaderTypeDef RxHeader;
 Motor_parameters_HandleTypeDef Motor[6];
 
-float test;
-uint8_t date_len = 0;//date_len较为特殊，需要定义为全局变量，不然编译会报未使用变量警告
+uint8_t date_len = 0; // date_len较为特殊，需要定义为全局变量，不然编译会报未使用变量警告
+uint8_t echo_test;//测试使用可删除
+
+
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 {
     // 检查 FIFO0 中是否有新消息
-    if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != RESET)    /* FIFO1新数据中断 */
+    if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != RESET) // FIFO0新数据中断
     {
-			//只有有数据才创建变量，节省内存，同时可以在使用完成后，自动销毁
-			uint8_t read_data[30] = {0};
-			uint16_t rec_id;
-			uint8_t id;
-			uint8_t func;
-			//调用接收函数
-			date_len = fdcanx_receive(&hfdcan1, &rec_id, read_data);
-      
-			//提取功能码与id信息
-			id = rec_id >> 7;
-			func = rec_id & 0x007F;//rec_id为16位
-			
-			Motor[id].function_code = func;
-			
-			//根据不同功能码提取数据到指定Motor结构体中
-			switch(Motor[id].function_code)
-			{
-				case 0x32://读取实际位置
-				{
-					uint8_t Positionbyte[] = {read_data[0], read_data[1], read_data[2], read_data[3]};
-					Motor[id].actual_position = *((float*)Positionbyte);
-					break;
-				}
-				case 0x33://读取实际速度
-				{
-					break;
-				}
-				case 0x34://读取实际转矩
-				{
-					break;
-				}
-				case 0x35://读取输出功率
-				{
-					break;
-				}
-				case 0x36://读取跟随误差
-				{
-					break;
-				}
-				case 0x37://读取总线电压
-				{
-					break;
-				}
-				case 0x38://读取电池电压
-				{
-					break;
-				}
-			}
-			
-//        // 接收消息
-//        if (HAL_FDCAN_GetRxMessage(&hfdcan1, FDCAN_RX_FIFO0, &RxHeader, RxData) == HAL_OK)
-//        {
+        // 定义数据和接收ID
+        uint8_t read_data[30] = {0};
+        uint16_t rec_id;
+        uint8_t id, func;
+        float* target_data;//用这个指针指向结构体中的具体参数
+				
+        // 调用接收函数
+        date_len = fdcanx_receive(&hfdcan1, &rec_id, read_data);
 
-//						// 复制 RxData 的数据到 Rx_data 
-//					  memcpy(Rx_data, RxData, sizeof(RxData)); 
-//					 // 清空 RxData 数组 
-//					  memset(RxData, 0, sizeof(RxData));
-//            // 检查消息ID和DLC
-//            if ((RxHeader.Identifier == ((1 << 7) | 0x05)) && (RxHeader.DataLength == FDCAN_DLC_BYTES_1))
-//            {
-//                // 处理执行结果
-//                switch (RxData[0])
-//                {
-//                    case 0x00:
-//												printf("SUCCESS!");
-//                        // 正常执行
-//                        break;
-//                    case 0x01:
-//												printf("FILED!");
-//                        // 异常执行
-//                        break;
-//                    default:
-//                        // 未知结果
-//                        break;
-//                }
-//            }
-//        }
-      }
+        // 提取功能码与id信息
+        id = rec_id >> 7;
+        func = rec_id & 0x007F; // rec_id为16位
 
+        Motor[id-motor_offset].function_code = func;
+				
+				// 根据功能码提取数据到指定Motor结构体中
+        switch (func)
+        {
+					  //只读
+            case 0x32: target_data = &Motor[id-motor_offset].actual_position; break;//实际位置
+            case 0x33: target_data = &Motor[id-motor_offset].actual_speed; break;//实际速度
+            case 0x34: target_data = &Motor[id-motor_offset].actual_torque; break;//实际扭矩
+            case 0x35: target_data = &Motor[id-motor_offset].output_power; break;//输出功率
+            case 0x36: target_data = &Motor[id-motor_offset].follow_error; break;//跟随误差
+            case 0x37: target_data = &Motor[id-motor_offset].bus_voltage; break;//总线电压
+            case 0x38: target_data = &Motor[id-motor_offset].battery_voltage; break;//电池电压
+					  
+					  //操作电机后，同时也要读数据
+            case 0x2A://设置跟随位置后读数据
+						case 0x28://设置跟随速度后读数据
+						case 0x25://设置轮廓位置后读数据
+						case 0x23://设置轮廓速度后读数据
+            {
+                uint8_t echo = read_data[0];
+								echo_test = echo;
+								uint8_t index = 1; // 指向要提取的数据
+								for (int i = 1; i <= 6; i++) // 从高位开始检验
+								{
+										if (echo & (1 << i))
+										{
+												switch (i)
+												{
+														case 6: target_data = &Motor[id-motor_offset].bus_voltage; break;
+														case 5: target_data = &Motor[id-motor_offset].follow_error; break;
+														case 4: target_data = &Motor[id-motor_offset].output_power; break;
+														case 3: target_data = &Motor[id-motor_offset].actual_torque; break;
+														case 2: target_data = &Motor[id-motor_offset].actual_speed; break;
+														case 1: target_data = &Motor[id-motor_offset].actual_position; break;
+												}
+												memcpy(target_data, read_data + index, 4);
+												index += 4; // 提取一次偏移4字节
+										}
+								}
+                break;
+            }
+						
+            default:
+                // 处理未知功能码的情况
+                return;
+        }
+        
+				//0x32-0x38功能码执行
+				if (func >= 0x32 && func <= 0x38)
+				{
+						memcpy(target_data, read_data, 4);
+				}
+    }
 }
+
+
+ 
+ 
+
 

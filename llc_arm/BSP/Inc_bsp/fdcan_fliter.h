@@ -18,6 +18,16 @@ void FDCAN_Filter_Config(void);
  * @retval 返回值为数据长度
  */
 uint8_t fdcanx_receive(FDCAN_HandleTypeDef *hfdcan, uint16_t *rec_id, uint8_t *buf);
+
+/**
+ * @brief  echo处理函数
+ * 
+ * 此函数负责接收echo后，将数据传回电机结构体
+ * 
+ * @param  *read_data 读取到的数据
+ */
+void echo(uint8_t *read_data);
+
 //自定义结构体
 typedef struct{
   float actual_position;   //实际距离 单位rad
@@ -29,6 +39,7 @@ typedef struct{
 	float battery_voltage;   //电池电压 单位V
 	uint8_t function_code;   //功能码
 }Motor_parameters_HandleTypeDef;
-
+//自定义宏定义
+#define  motor_offset 1
 
 #endif
