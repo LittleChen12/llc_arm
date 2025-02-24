@@ -314,17 +314,17 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Motor</ItemText>
+          <ItemText>Motor,0x10</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>speed_test,0x0A</ItemText>
+          <ItemText>read_data</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>read_data</ItemText>
+          <ItemText>date_len,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

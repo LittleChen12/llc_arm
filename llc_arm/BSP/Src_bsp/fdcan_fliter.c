@@ -96,25 +96,23 @@ uint8_t fdcanx_receive(FDCAN_HandleTypeDef *hfdcan, uint16_t *rec_id, uint8_t *b
  */
 FDCAN_RxHeaderTypeDef RxHeader;
 Motor_parameters_HandleTypeDef Motor[6];
-
+uint8_t Read_datatest[32] = {0};
+uint8_t read_data[32] = {0};
 uint8_t date_len = 0; // date_len较为特殊，需要定义为全局变量，不然编译会报未使用变量警告
-uint8_t echo_test;//测试使用可删除
-
-
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 {
     // 检查 FIFO0 中是否有新消息
     if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != RESET) // FIFO0新数据中断
     {
+//				uint8_t read_data[29] = {0};
         // 定义数据和接收ID
-        uint8_t read_data[30] = {0};
         uint16_t rec_id;
         uint8_t id, func;
         float* target_data;//用这个指针指向结构体中的具体参数
 				
         // 调用接收函数
         date_len = fdcanx_receive(&hfdcan1, &rec_id, read_data);
-
+				memcpy(Read_datatest,read_data,29);
         // 提取功能码与id信息
         id = rec_id >> 7;
         func = rec_id & 0x007F; // rec_id为16位
@@ -140,23 +138,45 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 						case 0x23://设置轮廓速度后读数据
             {
                 uint8_t echo = read_data[0];
-								echo_test = echo;
 								uint8_t index = 1; // 指向要提取的数据
-								for (int i = 1; i <= 6; i++) // 从高位开始检验
+								for (int i = 0; i <= 6; i++) // 从0位开始检验
 								{
 										if (echo & (1 << i))
 										{
 												switch (i)
 												{
-														case 6: target_data = &Motor[id-motor_offset].bus_voltage; break;
-														case 5: target_data = &Motor[id-motor_offset].follow_error; break;
-														case 4: target_data = &Motor[id-motor_offset].output_power; break;
-														case 3: target_data = &Motor[id-motor_offset].actual_torque; break;
-														case 2: target_data = &Motor[id-motor_offset].actual_speed; break;
-														case 1: target_data = &Motor[id-motor_offset].actual_position; break;
+														case 6: 
+															memcpy(&Motor[id-motor_offset].bus_voltage, read_data + index, 4);
+															index += 4; // 提取一次偏移4字节
+															break;														
+														case 5: 
+															memcpy(&Motor[id-motor_offset].follow_error, read_data + index, 4);
+															index += 4; // 提取一次偏移4字节
+															break;
+														case 4: 
+															memcpy(&Motor[id-motor_offset].output_power, read_data + index, 4);
+															index += 4; // 提取一次偏移4字节
+															break;
+														case 3: 
+															memcpy(&Motor[id-motor_offset].actual_torque, read_data + index, 4);
+														index += 4; // 提取一次偏移4字节
+															break;
+														case 2: 
+															memcpy(&Motor[id-motor_offset].actual_speed, read_data + index, 4);
+															index += 4; // 提取一次偏移4字节
+															break;
+														case 1: 
+															memcpy(&Motor[id-motor_offset].actual_position, read_data + index, 4);
+															index += 4; // 提取一次偏移4字节
+															break;
+													  case 0: 
+															Motor[id-motor_offset].state[0] = read_data[1];
+															Motor[id-motor_offset].state[1] = read_data[2];
+															Motor[id-motor_offset].state[2] = read_data[3];
+															Motor[id-motor_offset].state[3] = read_data[4];		
+															index += 4; // 提取一次偏移4字节														
+															break;
 												}
-												memcpy(target_data, read_data + index, 4);
-												index += 4; // 提取一次偏移4字节
 										}
 								}
                 break;

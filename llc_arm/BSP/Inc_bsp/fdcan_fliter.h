@@ -30,6 +30,7 @@ void echo(uint8_t *read_data);
 
 //自定义结构体
 typedef struct{
+	uint8_t state[4];       //状态信息
   float actual_position;   //实际距离 单位rad
 	float actual_speed;      //实际速度 单位rad/s
 	float actual_torque;     //实际转矩 单位Nm

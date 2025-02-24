@@ -86,6 +86,15 @@ void Set_Custom_Contour_Torque(uint16_t id,uint8_t echo, uint8_t sync, float Tar
 void Set_Follow_Torque(uint16_t id,uint8_t echo,uint8_t sync,float Targe_Torque);
 
 /**
+ * @brief  读取状态信息
+ * 
+ * 此函数负责读取电机实际位置 控制数据字节长度：0 功能码： 0x31
+ * 
+ * @param  id：电机id号  
+ */
+void Read_State(uint16_t id);
+
+/**
  * @brief  读取实际位置
  * 
  * 此函数负责读取电机实际位置 控制数据字节长度：0 功能码： 0x32
@@ -103,6 +112,14 @@ void Read_Actual_Position(uint16_t id);
  */
 void Read_Actual_Speed(uint16_t id);
 	
+/**
+ * @brief  读取总线电压
+ * 
+ * 此函数负责读取总线电压 控制数据字节长度：0 功能码： 0x37
+ * 
+ * @param  id：电机id号  
+ */
+void Read_Bus_Voltage(uint16_t id);
 
 /**
  * @brief  跟随位置模式
