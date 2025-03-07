@@ -317,7 +317,7 @@ void Set_Follow_Torque(uint16_t id,uint8_t echo,uint8_t sync,float Targe_Torque)
 /**
  * @brief  读取状态信息
  * 
- * 此函数负责读取电机实际位置 控制数据字节长度：0 功能码： 0x31
+ * 此函数负责读取电机状态信息 控制数据字节长度：0 功能码： 0x31
  * 
  * @param  id：电机id号  
  */
@@ -437,6 +437,21 @@ void Set_Contour_Position(uint16_t id,uint8_t echo, uint8_t sync, float Targe_Po
 		//数据发送
 		fdcanx_send_data(id,data,6,0x25);
 }
+
+/**
+ * @brief  读取编码器电池电压
+ * 
+ * 此函数负责读取编码器电池电压 控制数据字节长度：0 功能码： 0x38
+ * 
+ * @param  id：电机id号 
+ */
+
+void Read_Battery_Voltage(uint16_t id)
+{
+		fdcanx_send_data(id,NULL,0,0x38);
+}
+
+
 	
 
 

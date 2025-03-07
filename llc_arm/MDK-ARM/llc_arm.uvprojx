@@ -634,6 +634,11 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\Src_bsp\dstp_motor.c</FilePath>
             </File>
+            <File>
+              <FileName>limit_switch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\Src_bsp\limit_switch.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

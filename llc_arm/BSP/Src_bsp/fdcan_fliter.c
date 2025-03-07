@@ -130,6 +130,15 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
             case 0x36: target_data = &Motor[id-motor_offset].follow_error; break;//跟随误差
             case 0x37: target_data = &Motor[id-motor_offset].bus_voltage; break;//总线电压
             case 0x38: target_data = &Motor[id-motor_offset].battery_voltage; break;//电池电压
+					  case 0x31: 
+						{
+							//小端读取要错位
+							Motor[id-motor_offset].state[0] = read_data[1];
+							Motor[id-motor_offset].state[1] = read_data[0];
+							Motor[id-motor_offset].state[2] = read_data[3];
+							Motor[id-motor_offset].state[3] = read_data[2];	
+							break;
+						}
 					  
 					  //操作电机后，同时也要读数据
             case 0x2A://设置跟随位置后读数据
@@ -170,10 +179,10 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 															index += 4; // 提取一次偏移4字节
 															break;
 													  case 0: 
-															Motor[id-motor_offset].state[0] = read_data[1];
-															Motor[id-motor_offset].state[1] = read_data[2];
-															Motor[id-motor_offset].state[2] = read_data[3];
-															Motor[id-motor_offset].state[3] = read_data[4];		
+															Motor[id-motor_offset].state[0] = read_data[2];
+															Motor[id-motor_offset].state[1] = read_data[1];
+															Motor[id-motor_offset].state[2] = read_data[4];
+															Motor[id-motor_offset].state[3] = read_data[3];		
 															index += 4; // 提取一次偏移4字节														
 															break;
 												}

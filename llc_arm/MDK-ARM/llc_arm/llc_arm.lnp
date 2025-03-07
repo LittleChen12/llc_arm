@@ -44,6 +44,7 @@
 "llc_arm\port.o"
 "llc_arm\fdcan_fliter.o"
 "llc_arm\dstp_motor.o"
+"llc_arm\limit_switch.o"
 "llc_arm\led_task.o"
 "llc_arm\motor_control_task.o"
 --library_type=microlib --strict --scatter "llc_arm\llc_arm.sct"

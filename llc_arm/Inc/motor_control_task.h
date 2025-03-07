@@ -5,6 +5,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "dstp_motor.h"
+#include "limit_switch.h"
 #include <stdio.h>
 #include <string.h>
 

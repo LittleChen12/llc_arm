@@ -122,7 +122,7 @@ void Read_Actual_Speed(uint16_t id);
 void Read_Bus_Voltage(uint16_t id);
 
 /**
- * @brief  跟随位置模式
+ * @brief  跟随速度模式
  * 
  * 此函数负责电机的周期位置运动 控制数据字节长度：6 功能码：0x28
  * 
@@ -148,5 +148,16 @@ void Set_Contour_Speed(uint16_t id,uint8_t echo, uint8_t sync, float Targe_Speed
  * @param  id：电机id号 echo:数据接收 sync：电机同步功能 Targe_Torque：目标转矩
  */
 void Set_Contour_Position(uint16_t id,uint8_t echo, uint8_t sync, float Targe_Position);
+
+/**
+ * @brief  读取编码器电池电压
+ * 
+ * 此函数负责读取编码器电池电压 控制数据字节长度：0 功能码： 0x38
+ * 
+ * @param  id：电机id号 
+ */
+
+void Read_Battery_Voltage(uint16_t id);
+
 
 #endif

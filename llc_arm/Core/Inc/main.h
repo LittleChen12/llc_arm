@@ -63,6 +63,20 @@ void Error_Handler(void);
 #define KEY1_GPIO_Port GPIOA
 #define LED_Pin GPIO_PIN_7
 #define LED_GPIO_Port GPIOE
+#define Relay_Switch_Pin GPIO_PIN_8
+#define Relay_Switch_GPIO_Port GPIOE
+#define Limit_Switch_1_Pin GPIO_PIN_9
+#define Limit_Switch_1_GPIO_Port GPIOE
+#define Limit_Switch_2_Pin GPIO_PIN_10
+#define Limit_Switch_2_GPIO_Port GPIOE
+#define Limit_Switch_3_Pin GPIO_PIN_11
+#define Limit_Switch_3_GPIO_Port GPIOE
+#define Limit_Switch_4_Pin GPIO_PIN_12
+#define Limit_Switch_4_GPIO_Port GPIOE
+#define Limit_Switch_5_Pin GPIO_PIN_13
+#define Limit_Switch_5_GPIO_Port GPIOE
+#define Limit_Switch_6_Pin GPIO_PIN_14
+#define Limit_Switch_6_GPIO_Port GPIOE
 
 /* USER CODE BEGIN Private defines */
 

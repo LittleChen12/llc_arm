@@ -51,5 +51,6 @@ llc_arm\motor_control_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include
 llc_arm\motor_control_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
 llc_arm\motor_control_task.o: ../BSP/Inc_bsp/dstp_motor.h
 llc_arm\motor_control_task.o: ../Core/Inc/fdcan.h
+llc_arm\motor_control_task.o: ../BSP/Inc_bsp/limit_switch.h
 llc_arm\motor_control_task.o: D:\KEIL\ARM\ARMCC\Bin\..\include\stdio.h
 llc_arm\motor_control_task.o: D:\KEIL\ARM\ARMCC\Bin\..\include\string.h

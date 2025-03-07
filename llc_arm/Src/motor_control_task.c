@@ -7,47 +7,57 @@ float acc_test = 0.0f;
 long int tick;
 float time_base;
 
+uint8_t test[6];
 
 Dstp_Motor_Send dstp_motor_send[6];
-
+float Motor_relay_position[6] = {165.3f,79.1f,-53.77f,3.07f,12.71,55.8};//存放电机初始位置
+	
 void Motor_Control_start(void *argument)
 {
-	Motor_origin_setting(1);//设定原点
-	Motor_origin_setting(2);//设定原点
-	Motor_origin_setting(3);//设定原点
-	Motor_origin_setting(4);//设定原点
-	Motor_origin_setting(5);//设定原点
-	Motor_origin_setting(6);//设定原点
-	osDelay(10);
-//	Motor_mode_setting(6,0x06);//选择控制模式
-//	osDelay(10);
-//	Motor_stop(6);
-//	osDelay(100);
-//	Motor_start(6);//启动电机
-//	osDelay(1000);
+	Control_Relay_Switch(GPIO_PIN_RESET);//关闭所有抱闸开关	
+	for(uint8_t i=1; i<=6; i++)
+	{
+	  Motor_mode_setting(i,0x03);
+		Motor_start(i);
+	}
+	for(uint8_t id_count=1; id_count<=6; id_count++)
+	{
+	  Set_Contour_Speed(id_count,0,0,0);
+	}
+
+	Control_Relay_Switch(GPIO_PIN_SET);//打开所有抱闸开关
+	osDelay(6000);
+	Relay_Motor(Motor_relay_position);//所有电机复位
+	osDelay(10000);
+	Motor_mode_setting(2,0x06);//选择控制模式 
   for(;;)
   {
-//    Read_State(3);
-//		Read_Bus_Voltage(6);
-		Read_Actual_Position(1);
-		Read_Actual_Position(2);
-		Read_Actual_Position(3);
-		Read_Actual_Position(4);
-		Read_Actual_Position(5);
-		Read_Actual_Position(6);
-//		if(time_base<=2.0f)
-//		{
-//			position_test = 0.5*1*time_base*time_base;
-//		}
-//		else if(position_test<=3)
-//		{
-//			position_test = 2.0f + 2.0f*(time_base-2.0f);
-//		}
-//		Follow_Position_Mode(6,0x7f,0,position_test);
 
-//		
-//		//时间1ms
-//		time_base = ((tick++) * 0.001f);
-		osDelay(2);
+			
+      //Read_State(6);
+//		Read_Bus_Voltage(6);
+//		Read_Actual_Position(1);
+//		Read_Actual_Position(2);
+//		Read_Actual_Position(3);
+//		Read_Actual_Position(4);
+//		Read_Actual_Position(5);
+//		Read_Actual_Position(6);
+		
+		if(time_base<=2.0f)
+		{
+			position_test = Motor_relay_position[1] + 0.5f*5.0f*time_base*time_base;
+		}
+		else if(time_base>2.0f&&time_base<=4.0f)
+		{
+			position_test = Motor_relay_position[1] + 10.0f + 10.0f*(time_base-2.0f);
+		}
+		Follow_Position_Mode(2,0x7f,0,position_test);
+//		Follow_Speed_Mode(6,0x7f,0,10.0f);
+		
+		Read_Limit_Switch();
+		
+		//时间1ms
+		time_base = ((tick++) * 0.001f);
+		osDelay(1);
   }
 }
