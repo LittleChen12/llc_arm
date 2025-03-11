@@ -8,6 +8,7 @@
 #include "limit_switch.h"
 #include <stdio.h>
 #include <string.h>
+#include "controler.h"
 
 //єЇКэ¶ЁТе
 

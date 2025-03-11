@@ -47,6 +47,7 @@
 "llc_arm\limit_switch.o"
 "llc_arm\led_task.o"
 "llc_arm\motor_control_task.o"
+"llc_arm\controler.o"
 --library_type=microlib --strict --scatter "llc_arm\llc_arm.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

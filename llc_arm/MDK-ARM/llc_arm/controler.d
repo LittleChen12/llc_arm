@@ -1,0 +1,11 @@
+llc_arm\controler.o: ..\Src\controler.c
+llc_arm\controler.o: ../Inc/controler.h
+llc_arm\controler.o: ../Middlewares/ST/ARM/DSP/Inc/arm_math.h
+llc_arm\controler.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
+llc_arm\controler.o: D:\KEIL\ARM\ARMCC\Bin\..\include\stdint.h
+llc_arm\controler.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
+llc_arm\controler.o: D:\KEIL\ARM\ARMCC\Bin\..\include\string.h
+llc_arm\controler.o: D:\KEIL\ARM\ARMCC\Bin\..\include\math.h
+llc_arm\controler.o: D:\KEIL\ARM\ARMCC\Bin\..\include\float.h
+llc_arm\controler.o: D:\KEIL\ARM\ARMCC\Bin\..\include\limits.h
+llc_arm\controler.o: D:\KEIL\ARM\ARMCC\Bin\..\include\stdio.h

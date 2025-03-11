@@ -654,6 +654,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\motor_control_task.c</FilePath>
             </File>
+            <File>
+              <FileName>controler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\controler.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
