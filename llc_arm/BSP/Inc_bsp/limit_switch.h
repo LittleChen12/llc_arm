@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "main.h"
 #include "dstp_motor.h"
+#include "fdcan_fliter.h"
 
 //全局变量
 extern uint8_t Limit_switch_state[6];
@@ -34,7 +35,16 @@ void Control_Relay_Switch(GPIO_PinState status);
  * 
  * @param  position 初始位置
  */
-void Relay_Motor(float* position);													
+void Relay_Motor(float* position);	
+
+/**
+ * @brief  电机错误保护
+ * 
+ * 此函数当电机发生错误信息时，关闭抱闸开关
+ * 
+ * @param  Motor 电机结构体
+ */
+void Motor_Error_Project(Motor_parameters_HandleTypeDef* Motor);
 
 #endif
 

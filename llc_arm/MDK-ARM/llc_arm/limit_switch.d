@@ -40,3 +40,6 @@ llc_arm\limit_switch.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h
 llc_arm\limit_switch.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h
 llc_arm\limit_switch.o: ../BSP/Inc_bsp/dstp_motor.h
 llc_arm\limit_switch.o: ../Core/Inc/fdcan.h
+llc_arm\limit_switch.o: ../BSP/Inc_bsp/fdcan_fliter.h
+llc_arm\limit_switch.o: D:\KEIL\ARM\ARMCC\Bin\..\include\stdio.h
+llc_arm\limit_switch.o: D:\KEIL\ARM\ARMCC\Bin\..\include\string.h

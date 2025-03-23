@@ -40,6 +40,8 @@ typedef struct{
 	float battery_voltage;   //电池电压 单位V
 	uint8_t function_code;   //功能码
 }Motor_parameters_HandleTypeDef;
+
+extern Motor_parameters_HandleTypeDef Motor[6];
 //自定义宏定义
 #define  motor_offset 1
 

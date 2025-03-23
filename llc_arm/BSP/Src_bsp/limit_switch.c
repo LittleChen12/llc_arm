@@ -48,3 +48,40 @@ void Relay_Motor(float* position)
 	  Set_Contour_Position(id_count,0,0,position[id_count-1]);
 	}
 }
+
+/**
+ * @brief  电机错误保护
+ * 
+ * 此函数当电机发生错误信息时，关闭抱闸开关
+ * 
+ * @param  Motor 电机结构体
+ */
+void Motor_Error_Project(Motor_parameters_HandleTypeDef* Motor)
+{
+	uint8_t error_flag = 0;
+	
+	//判断电机是否有错误信息
+	if(Motor->state[2] != 0 ||  Motor->state[3] != 0)
+		error_flag = 1;
+	
+	//执行保护措施
+	for(int i=1;i<=6;i++)
+	{
+		if(error_flag==1)//发生错误
+		{
+			Clear_Error(i);//清除错误
+			Motor_start(i);//启动电机
+		}
+  }
+	
+	Control_Relay_Switch(GPIO_PIN_RESET);//关闭所有抱闸开关
+	
+	for(int i=1;i<=6;i++)
+	{
+		if(error_flag==1)//发生错误
+		{
+			Quick_Stop_Motor(i);//快速停止电机
+		}
+  }		
+	
+}
