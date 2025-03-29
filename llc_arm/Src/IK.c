@@ -227,7 +227,7 @@ void calc_wrist_angles(float theta[6],
     
     // 计算前三轴的正运动学变换
 	  // 得到T0_3
-	  forward_kinematics(dh_matrix_IK,3,theta,t_temp_IK,T0_3_matrix,t_trans_IK,&T_temp_IK,&T0_3_MATRIX,&T_trans_IK);
+	  forward_kinematics(dh_matrix_IK,3,theta,T0_3_matrix,t_trans_IK,&T0_3_MATRIX,&T_trans_IK);
 
     // 提取 T0_3 的旋转部分 R0_3 (3×3)
     float R0_3[9] = {0};

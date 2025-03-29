@@ -71,7 +71,7 @@ void matrix_init(void)
 //测试正解
 void dh_test(void)
 {
-	forward_kinematics(dh_matrix,6,real_motor_theta,t_temp,t_result,t_trans,&T_temp,&T_result,&T_trans);
+	forward_kinematics(dh_matrix,6,real_motor_theta,t_result,t_trans,&T_result,&T_trans);
 	forward_kinematics2(dh_matrix);
 }
 
@@ -108,24 +108,24 @@ void compute_modified_dh_matrix(float modified_dh_matrix[6][4], int i,float moto
 
 //正向运动学
 void forward_kinematics(float modified_dh_matrix[6][4], int num_joints,float motor_theta[6],
-	float t_temp_matrix[16],float t_result_matrix[16],float t_trans_matrix[16],
-		arm_matrix_instance_f32 *T_temp_matrix,arm_matrix_instance_f32 *T_result_matrix,arm_matrix_instance_f32 *T_trans_matrix) 
+float t_result_matrix[16],float t_trans_matrix[16],
+arm_matrix_instance_f32 *T_result_matrix,arm_matrix_instance_f32 *T_trans_matrix) 
 {
-		float cumulative_matrix[16] = {
-														1.0f, 0.0f, 0.0f, 0.0f,
-														0.0f, 1.0f, 0.0f, 0.0f,
-														0.0f, 0.0f, 1.0f, 0.0f,
-														0.0f, 0.0f, 0.0f, 1.0f};
-		arm_mat_init_f32(&Cumulative_matrix, 4, 4, cumulative_matrix); // 累乘矩阵		
-																										
+		float cumulative_matrix_init[16] = {
+													1.0f, 0.0f, 0.0f, 0.0f,
+													0.0f, 1.0f, 0.0f, 0.0f,
+													0.0f, 0.0f, 1.0f, 0.0f,
+													0.0f, 0.0f, 0.0f, 1.0f};			
+		memcpy(cumulative_matrix, cumulative_matrix_init, sizeof(&cumulative_matrix_init)*16);				
+													
     for (int i = 0; i < num_joints; i++) {
         compute_modified_dh_matrix(modified_dh_matrix, i,motor_theta,t_trans_matrix);//计算变化矩阵
-        arm_mat_mult_f32(&Cumulative_matrix, T_trans_matrix, T_temp_matrix);//不断左乘变化矩阵
-				memcpy(cumulative_matrix, t_temp_matrix, sizeof(&t_temp_matrix)*16);				
+        arm_mat_mult_f32(&Cumulative_matrix, T_trans_matrix, &T_temp);//不断左乘变化矩阵
+				memcpy(cumulative_matrix, t_temp, sizeof(&t_temp)*16);				
     }
 		// 将乘法结果复制回 t_result 并更新 T_result
-		memcpy(t_result_matrix, t_temp_matrix, sizeof(&t_temp_matrix)*16);		
-		//arm_mat_mult_f32(&T_result,&T_xyz_6,&T_xyz_0);
+		memcpy(t_result_matrix, t_temp, sizeof(&t_temp)*16);		
+		arm_mat_mult_f32(&T_result,&T_xyz_6,&T_xyz_0);
 }
 
 
