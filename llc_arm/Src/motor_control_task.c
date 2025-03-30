@@ -8,7 +8,7 @@ long int tick;
 float time_base;
 uint8_t stop_flag;//抱闸开关用
 
-
+float theta[6];
 
 Dstp_Motor_Send dstp_motor_send[6];
 float Motor_relay_position[6] = {165.3f,80.0f,-54.5f,3.07f,12.73f,56.0f};//存放电机初始位置
@@ -19,18 +19,18 @@ void Motor_Control_start(void *argument)
 {
 	  matrix_init();
   	IK_matrix_init();
-	Control_Relay_Switch(GPIO_PIN_RESET);//关闭所有抱闸开关	
-	for(uint8_t i=1; i<=6; i++)
-	{
-	  Motor_mode_setting(i,0x03);
-		Motor_start(i);
-	}
-	for(uint8_t id_count=1; id_count<=6; id_count++)
-	{
-	  Set_Contour_Speed(id_count,0,0,0);
-	}
+//	Control_Relay_Switch(GPIO_PIN_RESET);//关闭所有抱闸开关	
+//	for(uint8_t i=1; i<=6; i++)
+//	{
+//	  Motor_mode_setting(i,0x03);
+//		Motor_start(i);
+//	}
+//	for(uint8_t id_count=1; id_count<=6; id_count++)
+//	{
+//	  Set_Contour_Speed(id_count,0,0,0);
+//	}
 
-	Control_Relay_Switch(GPIO_PIN_SET);//打开所有抱闸开关
+//	Control_Relay_Switch(GPIO_PIN_SET);//打开所有抱闸开关
 //	osDelay(6000);
 //	Relay_Motor(Motor_relay_position);//所有电机复位
 //	osDelay(10000);
@@ -42,10 +42,8 @@ void Motor_Control_start(void *argument)
 		
   for(;;)
   {
-		
-	//正解
-		dh_test();	
-		IK_test();
+		IK(position_init,dh_matrix_IK,theta);
+    //trace_test(0);	
 //		for(int i=1;i<=6;i++)
 //		{
 //			switch(i){

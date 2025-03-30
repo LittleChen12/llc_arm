@@ -4,9 +4,9 @@ addpath(genpath('FK'),genpath('IK'),genpath('TRAJECT'),genpath('demo'),genpath('
 
 % 已知工具坐标系的初始位置
 T0_C_init = [1.0000,         0,         0,    0.2450;
-             0,   -1.0000,         0,    0.0120;
-             0,         0,   -1.0000,    0.4470;
-             0,         0,         0,    1.0000];
+                  0,    1.0000,         0,    0.0120;
+                  0,         0,    1.0000,    0.4470;
+                  0,         0,         0,    1.0000];
        
 % 已知工具坐标系的最终位置
 T0_C_end = [  -0.0154,    0.0764,   -0.9970,    0.2391;
@@ -21,9 +21,9 @@ T6_C = [1, 0, 0, 0;
         0, 0, 0, 1];
 
 demo_ik_fk=0; %正逆解测试
-demo_show_forward=0; %正解显示
+demo_show_forward=1; %正解显示
 demo_show_inverse=0; %位置逆解显示
-demo_trajectory_plan=1;   %自己写的轨迹规划代码
+demo_trajectory_plan=0;   %自己写的轨迹规划代码
 
 if demo_ik_fk+demo_show_forward+demo_show_inverse+demo_trajectory_plan>1
     error('run one function one time 一次运行一个选项')
@@ -41,7 +41,7 @@ if demo_show_forward
     %直观的查看正解
     %输入关节显示正解的矩阵并显示robot的状态
     %调用的方法位于demo文件夹
-    joints = [   -0.4487   -0.4496   -0.4505    2.6902    3.5939    2.6884];
+    joints = [ -3.0437   -0.5073   -1.9977    3.1416   -2.5049    3.0437];
     show_forward(joints);
 end
 
@@ -51,12 +51,12 @@ if demo_show_inverse
     %调用的方法位于demo文件夹
     T_IK_TEST = [
     1.0000  ,       0   ,      0   ,    0.2450;
-         0  , -1.0000   ,     0    ,    0.0120;
-         0  ,       0   ,  -1.0000 ,    0.4470;
+         0  ,  1.0000   ,     0    ,    0.0120;
+         0  ,       0   ,   1.0000 ,    0.4470;
          0  ,       0   ,      0   ,    1.0000;        
     
     ];
-    show_ik(T0_C_middle);
+    show_ik(T_IK_TEST);
 
 end
 

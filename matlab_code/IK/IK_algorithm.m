@@ -18,7 +18,10 @@ function execute_solution = IK_algorithm(T0_6, dh)
     solutions(:, 6) = [sol123_3; sol3_2];
     solutions(:, 7) = [sol123_4; sol4_1];
     solutions(:, 8) = [sol123_4; sol4_2];
-    
+    % 打印所有8组解
+    disp('All solutions:');
+    disp(solutions');
+
     % 默认返回第一组解（可根据需求修改选择逻辑）
     execute_solution = solutions(:, 1);
 
@@ -144,28 +147,44 @@ function [sol1, sol2] = calc_wrist_angles(theta1, theta2, theta3, T0_6, dh)
     R0_3 = T0_3(1:3, 1:3);
     
     %% 计算腕部坐标系与欧拉角坐标系之间的变换
-    T3_4 = transformation_matrix(0, dh.alpha3, dh.a3, dh.d4);
+    T3_4 = transformation_matrix(0, dh.alpha3, dh.a3, dh.d4);%这儿可以简化
     R0_E = R0_3 * T3_4(1:3, 1:3);
     
     %% 从 T0_6 中提取末端旋转矩阵，并计算腕部部分的相对旋转矩阵
     R0_6 = T0_6(1:3, 1:3);
-    R_end = transpose(R0_E) * R0_6;
+    R_end = transpose(R0_E) * R0_6;%此处得到的是6号坐标系在4号坐标系下的表示
     
     %% 利用标准 Z–Y–Z 分解提取腕部角度（非奇异情况）
-    sol1_alpha = atan2( R_end(2,3), R_end(1,3) );
-    sol1_gamma = atan2( R_end(3,2), -R_end(3,1) );
-    sol1_beta = atan2( R_end(3,2)/sin(sol1_gamma), R_end(3,3)) - pi/2;
-    
-    
+    sol1_beta = atan2( sqrt(R_end(3,1)^2 + R_end(3,2)^2) , R_end(3,3));
+    if sol1_beta ~=0 && sol1_beta ~= pi
+        sol1_alpha = atan2( (R_end(2,3)/sin(sol1_beta)) , (R_end(1,3)/sin(sol1_beta)) );
+        sol1_gamma = atan2( R_end(3,2)/sin(sol1_beta) , -R_end(3,1)/sin(sol1_beta) );
+    elseif sol1_beta == 0
+        sol1_alpha = 0;
+        sol1_gamma = atan2(-R_end(1,2),R_end(1,1));
+    elseif sol1_beta == pi
+        sol1_alpha = 0;
+        sol1_gamma = atan2(R_end(1,2),-R_end(1,1));        
+    end
     %% 第一组解
-    sol1_theta4 = sol1_alpha;
-    sol1_theta5 = -sol1_beta + pi;
-    sol1_theta6 = sol1_gamma;
+    if sol1_alpha>0
+        sol1_theta4 = sol1_alpha - pi;
+    end
+    if sol1_alpha<=0
+        sol1_theta4 = pi + sol1_alpha;        
+    end
+    sol1_theta5 = sol1_beta - pi/2;
+    if sol1_gamma>0
+        sol1_theta6 = sol1_gamma - pi;
+    end
+    if sol1_gamma<=0
+        sol1_theta6 = pi + sol1_gamma;        
+    end
     sol1 = [sol1_theta4; sol1_theta5; sol1_theta6];
     
     %% 第二组解
     sol2_theta4 = sol1_theta4 + pi;
-    sol2_theta5 = sol1_beta;
+    sol2_theta5 = -sol1_beta - pi/2;%5角比较特殊
     sol2_theta6 = sol1_theta6 + pi;
     sol2 = [sol2_theta4; sol2_theta5; sol2_theta6];
 

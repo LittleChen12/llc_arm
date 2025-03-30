@@ -11,6 +11,7 @@
 #include "controler.h"
 #include "fdcan_fliter.h"
 #include "IK.h"
+#include "Trace_Plan.h"
 
 //º¯Êý¶¨Òå
 

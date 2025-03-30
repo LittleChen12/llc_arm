@@ -18,15 +18,12 @@ function show_ik(T0_6)
                 'd5', 0, ...
                 'd6', 0);
     joint = IK_algorithm(T0_6,dh);
-    disp(joint);
     
     base_xyz =[0 0 0];
     robot = puma560_robot(base_xyz);
     robot.display();    
 
-    robot.plot(joint);             % 非交互式更新角度
+    robot.plot(joint');             % 非交互式更新角度
     set(gca, 'XDir', 'reverse');   % 反转 x 轴方向 gca是获取当前坐标轴对象 XDir是x轴方向
     set(gca, 'YDir', 'reverse');   % 反转 y 轴方向
-
-
 end

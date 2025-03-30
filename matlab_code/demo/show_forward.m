@@ -24,8 +24,10 @@ function show_forward(joints)
     robot = puma560_robot(base_xyz);
     robot.display();    
     robot.plot(joint_rads);
-    %robot.teach();                 % 开启控制器    注：robot.plot是非交互式更新角度
+    % robot.teach();                 % 开启控制器    注：robot.plot是非交互式更新角度
     set(gca, 'XDir', 'reverse');   % 反转 x 轴方向 gca是获取当前坐标轴对象 XDir是x轴方向
     set(gca, 'YDir', 'reverse');   % 反转 y 轴方向
-    
+    out = robot.fkine(joint_rads);
+    disp('matlab工具箱正解：')
+    disp(out);
 end

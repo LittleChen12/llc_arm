@@ -15,7 +15,7 @@ void IK_matrix_init(void);
 //给theta123456[8][6]数组赋值，整理八组解
 void Assign_theta123456(void);
 
-void IK_test(void);
+void IK(float T0_6_matrix[16],float dh_matrix[6][4],float IK_theta[6]);
 
 /* 
  * 函数：solve_theta123
@@ -59,8 +59,9 @@ void calc_wrist_angles(float theta[6],
                        float sol1[3], float sol2[3]);
 
 
-
-
+//自定义变量
+extern float T0_6[16];
+extern float dh_matrix_IK[6][4];
 
 
 

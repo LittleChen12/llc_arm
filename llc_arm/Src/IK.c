@@ -93,15 +93,22 @@ void IK_matrix_init(void)
 
 
 
-void IK_test(void)
+void IK(float T0_6_matrix[16],float dh_matrix[6][4],float IK_theta[6])
 {
-	solve_theta123(end_trans,dh_matrix_IK,theta123_1,theta123_2,theta123_3,theta123_4);
-	calc_wrist_angles(theta123_1,end_trans, dh_matrix_IK,theta456_1_1,theta456_1_2);
-	calc_wrist_angles(theta123_2,end_trans, dh_matrix_IK,theta456_2_1,theta456_2_2);
-	calc_wrist_angles(theta123_3,end_trans, dh_matrix_IK,theta456_3_1,theta456_3_2);
-	calc_wrist_angles(theta123_4,end_trans, dh_matrix_IK,theta456_4_1,theta456_4_2);
+	solve_theta123(T0_6_matrix,dh_matrix,theta123_1,theta123_2,theta123_3,theta123_4);
+	calc_wrist_angles(theta123_1,T0_6_matrix, dh_matrix,theta456_1_1,theta456_1_2);
+	calc_wrist_angles(theta123_2,T0_6_matrix, dh_matrix,theta456_2_1,theta456_2_2);
+	calc_wrist_angles(theta123_3,T0_6_matrix, dh_matrix,theta456_3_1,theta456_3_2);
+	calc_wrist_angles(theta123_4,T0_6_matrix, dh_matrix,theta456_4_1,theta456_4_2);
 	Assign_theta123456();
+	
+	//默认返回第一组解
+	for(int i=0;i<6;i++)
+	{
+	  IK_theta[i] =  theta123456[0][i];
+	}
 }
+
 /* 
  * 函数：solve_theta123
  * ---------------------

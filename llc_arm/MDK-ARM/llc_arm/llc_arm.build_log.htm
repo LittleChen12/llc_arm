@@ -22,12 +22,19 @@ Dialog DLL:      TCM.DLL V1.53.0.0
  
 <h2>Project:</h2>
 C:\Users\28274\Desktop\ARM_CONTROLER\llc_arm\MDK-ARM\llc_arm.uvprojx
-Project File Date:  03/22/2025
+Project File Date:  03/29/2025
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\KEIL\ARM\ARMCC\Bin'
 Build target 'llc_arm'
-"llc_arm\llc_arm.axf" - 0 Error(s), 0 Warning(s).
+compiling motor_control_task.c...
+../Inc/Trace_Plan.h(36): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\Src\motor_control_task.c: 1 warning, 0 errors
+linking...
+Program Size: Code=30860 RO-data=3484 RW-data=1032 ZI-data=21400  
+FromELF: creating hex file...
+"llc_arm\llc_arm.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -51,7 +58,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.5.0
       Include file:  CMSIS/Core/Include/tz_context.h
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:04
 </pre>
 </body>
 </html>

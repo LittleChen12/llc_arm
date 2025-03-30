@@ -154,7 +154,7 @@
           <Type>0</Type>
           <LineNumber>825</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134220702</Address>
+          <Address>134220710</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -181,6 +181,26 @@
           <count>2</count>
           <WinNumber>1</WinNumber>
           <ItemText>theta123456</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>theta123456_output</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>IK_theta123456_init</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>IK_theta123456_end</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>theta</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -898,6 +918,18 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\Src\IK.c</PathWithFileName>
       <FilenameWithoutPath>IK.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>7</GroupNumber>
+      <FileNumber>51</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\Src\Trace_Plan.c</PathWithFileName>
+      <FilenameWithoutPath>Trace_Plan.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

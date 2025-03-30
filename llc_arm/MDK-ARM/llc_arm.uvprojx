@@ -664,6 +664,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\IK.c</FilePath>
             </File>
+            <File>
+              <FileName>Trace_Plan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\Trace_Plan.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
