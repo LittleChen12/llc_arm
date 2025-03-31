@@ -23,7 +23,10 @@ function show_traject(T_start,T_end,T_TIME,num)
     % 保存 x, y, z, theta4, theta5, theta6
     position_init = [T_start(1,4), T_start(2,4), T_start(3,4), theta123456_init(4), theta123456_init(5), theta123456_init(6)];
     position_end = [T_end(1,4), T_end(2,4), T_end(3,4), theta123456_end(4), theta123456_end(5), theta123456_end(6)];
-    
+    disp("init");
+    disp(position_init);
+    disp("end");
+    disp(position_end);
     for i = 1:6
         [stage(i,:),~,~,T_BASE] = linetraject(position_init(i) , position_end(i) , T_TIME , num);
     end
@@ -69,6 +72,9 @@ function show_traject(T_start,T_end,T_TIME,num)
         robot.animate(theta123456_output(i,:));
         pause(0.002);  % 根据需要添加延时以减轻刷新压力
     end
+
+    disp("轨迹规划角度：");
+    disp(theta123456_output);
 
 
 end

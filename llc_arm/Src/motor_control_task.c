@@ -8,7 +8,6 @@ long int tick;
 float time_base;
 uint8_t stop_flag;//抱闸开关用
 
-float theta[6];
 
 Dstp_Motor_Send dstp_motor_send[6];
 float Motor_relay_position[6] = {165.3f,80.0f,-54.5f,3.07f,12.73f,56.0f};//存放电机初始位置
@@ -17,33 +16,29 @@ float test[6]={-0.448716222*50.0f + 165.3f,-0.449609607*50.0f + 80.0f,-0.4505025
 
 void Motor_Control_start(void *argument)
 {
-	  matrix_init();
-  	IK_matrix_init();
-//	Control_Relay_Switch(GPIO_PIN_RESET);//关闭所有抱闸开关	
-//	for(uint8_t i=1; i<=6; i++)
-//	{
-//	  Motor_mode_setting(i,0x03);
-//		Motor_start(i);
-//	}
-//	for(uint8_t id_count=1; id_count<=6; id_count++)
-//	{
-//	  Set_Contour_Speed(id_count,0,0,0);
-//	}
+	matrix_init();
+  IK_matrix_init();
+	Control_Relay_Switch(GPIO_PIN_RESET);//关闭所有抱闸开关	
+	for(uint8_t i=1; i<=6; i++)
+	{
+	  Motor_mode_setting(i,0x03);
+		Motor_start(i);
+	}
+	for(uint8_t id_count=1; id_count<=6; id_count++)
+	{
+	  Set_Contour_Speed(id_count,0,0,0);
+	}
 
-//	Control_Relay_Switch(GPIO_PIN_SET);//打开所有抱闸开关
-//	osDelay(6000);
-//	Relay_Motor(Motor_relay_position);//所有电机复位
-//	osDelay(10000);
-//	
-//	//2号关节测试用
-//	Motor_mode_setting(2,0x06);//选择控制模式 
-//  Relay_Motor(test);
+	Control_Relay_Switch(GPIO_PIN_SET);//打开所有抱闸开关
+	osDelay(6000);
+	Relay_Motor(Motor_relay_position);//所有电机复位
+	osDelay(10000);
 
-		
+
+	Trace_run(10,5000);
   for(;;)
   {
-		IK(position_init,dh_matrix_IK,theta);
-    //trace_test(0);	
+		
 //		for(int i=1;i<=6;i++)
 //		{
 //			switch(i){
@@ -87,21 +82,21 @@ void Motor_Control_start(void *argument)
 //			time_base = ((tick++) * 0.001f);
 //		}
 //		
-//		//调试抱闸用
-//		if(HAL_GPIO_ReadPin(KEY1_GPIO_Port,KEY1_Pin) == 1)
-//		{
-//      for(int i=1;i<=6;i++)
-//      {
-//				Quick_Stop_Motor(i);
-//			}
-//			stop_flag = 1;
-//			Control_Relay_Switch(GPIO_PIN_RESET);//关闭所有抱闸开关
-//			osDelay(1000);
-//			for(uint8_t i=1;i<=6;i++)
-//			{
-//				Motor_stop(i);			
-//			}
-//		}
+		//调试抱闸用
+		if(HAL_GPIO_ReadPin(KEY1_GPIO_Port,KEY1_Pin) == 1)
+		{
+      for(int i=1;i<=6;i++)
+      {
+				Quick_Stop_Motor(i);
+			}
+			stop_flag = 1;
+			Control_Relay_Switch(GPIO_PIN_RESET);//关闭所有抱闸开关
+			osDelay(1000);
+			for(uint8_t i=1;i<=6;i++)
+			{
+				Motor_stop(i);			
+			}
+		}
 //		
 //		//电机错误后保护(待测试)
 //		for(int i=1;i<=6;i++)

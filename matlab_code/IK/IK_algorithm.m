@@ -18,9 +18,9 @@ function execute_solution = IK_algorithm(T0_6, dh)
     solutions(:, 6) = [sol123_3; sol3_2];
     solutions(:, 7) = [sol123_4; sol4_1];
     solutions(:, 8) = [sol123_4; sol4_2];
-    % 打印所有8组解
-    disp('All solutions:');
-    disp(solutions');
+    % % 打印所有8组解
+    % disp('All solutions:');
+    % disp(solutions');
 
     % 默认返回第一组解（可根据需求修改选择逻辑）
     execute_solution = solutions(:, 1);

@@ -1,16 +1,6 @@
 #include "IK.h"
 
 /////////////////////////////////////////////////////////////////已知值用于IK运算/////////////////////////////////////////////////////////////////////////////////
-//DH表
-float dh_matrix_IK[6][4] = {
-	  //alpha    a        d         theta
-		{0.0f,     0.0f,   0.212f,    0.0f},       // Joint 1
-		{-PI/2.0f, 0.04f,  0.062f,    -PI/2.0f},   // Joint 2
-		{0.0f,     0.18f,  -0.05f,    0.0f},       // Joint 3
-		{-PI/2.0f, 0.055f, 0.205027f, 0.0f},       // Joint 4
-		{PI/2.0f,  0.0f,   0.0f,      PI/2.0f},    // Joint 5
-		{-PI/2.0f, 0.0f,   0.0f,   		0.0f}        // Joint 6
-};
 
 //已知T0_6
 float T0_6[16] = {0.583360,   -0.492574,  0.645804,   0.046752,
@@ -41,10 +31,6 @@ float t_temp_IK[16] = {0};
 //T0_3变换矩阵
 arm_matrix_instance_f32 T0_3_MATRIX;
 float T0_3_matrix[16] = {0};
-
-//T0_3变换矩阵
-arm_matrix_instance_f32 T_trans_IK;
-float t_trans_IK[16] = {0};
 
 //T3_4变换矩阵
 arm_matrix_instance_f32 T3_4_MATRIX;
@@ -81,7 +67,6 @@ void IK_matrix_init(void)
 	arm_mat_init_f32(&T0_3_MATRIX, 4, 4, T0_3_matrix); 
 	arm_mat_init_f32(&T_temp_IK, 4, 4, t_temp_IK);     
   arm_mat_init_f32(&T3_4_MATRIX, 4, 4, T3_4_matrix);   
-	arm_mat_init_f32(&T_trans_IK, 4, 4, t_trans_IK);
 	
 	arm_mat_init_f32(&R0_3_MATRIX, 3, 3, R0_3_matrix); 
 	arm_mat_init_f32(&R3_4_MATRIX, 3, 3, R3_4_matrix);     
@@ -226,6 +211,8 @@ void solve_theta123(float T0_6[16], float dh_matrix[6][4],
  *    sol1 - 第一组腕部关节角 [theta4; theta5; theta6]
  *    sol2 - 第二组腕部关节角 [theta4; theta5; theta6]
  */
+
+
 void calc_wrist_angles(float theta[6],
                        float T0_6[16], float dh[6][4],
                        float sol1[3], float sol2[3])
@@ -234,13 +221,12 @@ void calc_wrist_angles(float theta[6],
     
     // 计算前三轴的正运动学变换
 	  // 得到T0_3
-	  forward_kinematics(dh_matrix_IK,3,theta,T0_3_matrix,t_trans_IK,&T0_3_MATRIX,&T_trans_IK);
+	  forward_kinematics(dh,3,theta,T0_3_matrix,&T0_3_MATRIX);
 
     // 提取 T0_3 的旋转部分 R0_3 (3×3)
     float R0_3[9] = {0};
-    int i, j;
-    for(i = 0; i < 3; i++){
-        for(j = 0; j < 3; j++){
+    for(uint8_t i = 0; i < 3; i++){
+        for(uint8_t j = 0; j < 3; j++){
             R0_3[i*3 + j] = T0_3_matrix[i*4 + j];
         }
     }
@@ -251,8 +237,8 @@ void calc_wrist_angles(float theta[6],
     
     // 提取 T3_4 的旋转部分 R3_4 (3×3)
     float R3_4[9] = {0};
-    for(i = 0; i < 3; i++){
-        for(j = 0; j < 3; j++){
+    for(uint8_t i = 0; i < 3; i++){
+        for(uint8_t j = 0; j < 3; j++){
             R3_4[i*3 + j] = T3_4_matrix[i*4 + j];
         }
     }
@@ -265,8 +251,8 @@ void calc_wrist_angles(float theta[6],
     
     // 提取 T0_6 的旋转部分 R0_6 (3×3)
     float R0_6[9];
-    for(i = 0; i < 3; i++){
-        for(j = 0; j < 3; j++){
+    for(uint8_t i = 0; i < 3; i++){
+        for(uint8_t j = 0; j < 3; j++){
             R0_6[i*3 + j] = T0_6[i*4 + j];
         }
     }
@@ -279,27 +265,41 @@ void calc_wrist_angles(float theta[6],
     memcpy(R_end,R_end_matrix,sizeof(R_end_matrix));
 		
     // 利用标准 Z–Y–Z 分解（非奇异情况）提取腕部角度
-    // MATLAB 中:
-    //   sol1_alpha = atan2( R_end(2,3), R_end(1,3) );
-    //   sol1_gamma = atan2( R_end(3,2), -R_end(3,1) );
-    //   sol1_beta  = atan2( R_end(3,2)/sin(sol1_gamma), R_end(3,3) ) - pi/2;
-    // 在 C 中 (利用 0-indexing)：
-    float sol1_alpha = atan2f(R_end[5], R_end[2]);       // R_end(2,3) -> index 5, R_end(1,3) -> index 2
-    float sol1_gamma = atan2f(R_end[7], -R_end[6]);        // R_end(3,2) -> index 7, R_end(3,1) -> index 6
-    float sol1_beta = atan2f(R_end[7] / arm_sin_f32(sol1_gamma), R_end[8]) - PI/2; // R_end(3,3) -> index 8
+    double sol1_gamma;
+    double sol1_beta;
+		double sol1_alpha;
+		
+		sol1_beta = atan2( sqrt(pow(R_end[6],2) + pow(R_end[7],2)) , R_end[8]);
+		if (sol1_beta != 0 && sol1_beta != PI) {
+        sol1_alpha = atan2f( (R_end[5]/ sinf(sol1_beta)) , (R_end[2]/ sinf(sol1_beta)) );
+        sol1_gamma = atan2f( (R_end[7]/ sinf(sol1_beta)) , (-R_end[6]/ sinf(sol1_beta)) );
+    }
+    else if (sol1_beta == 0) {
+        sol1_alpha = 0;
+        sol1_gamma = atan2f( -R_end[1], R_end[0] );
+    }
+    else if (sol1_beta == PI) {
+        sol1_alpha = 0;
+        sol1_gamma = atan2f( R_end[1], -R_end[0] );
+    }
+		
 
     // 第一组腕部解
-    float sol1_theta4 = sol1_alpha;
-    float sol1_theta5 = -sol1_beta + PI;
-    float sol1_theta6 = sol1_gamma;
+    float sol1_theta4 = Theta_Normalization(sol1_alpha);
+    float sol1_theta5 = sol1_beta - (PI / 2);
+    float sol1_theta6 = Theta_Normalization(sol1_gamma);
+		
+			
     sol1[0] = sol1_theta4;
     sol1[1] = sol1_theta5;
     sol1[2] = sol1_theta6;
     
-    // 第二组腕部解（腕翻解）
+    // 第二组腕部解
     float sol2_theta4 = sol1_theta4 + PI;
-    float sol2_theta5 = sol1_beta;
-    float sol2_theta6 = sol1_gamma + PI;
+    float sol2_theta5 = - sol1_beta - PI/2;
+    float sol2_theta6 = sol1_theta6 + PI;
+		
+		
     sol2[0] = sol2_theta4;
     sol2[1] = sol2_theta5;
     sol2[2] = sol2_theta6;
@@ -344,6 +344,14 @@ void Assign_theta123456(void)
             }
         }
     }
+}
+
+float Theta_Normalization(float theta)
+{
+	if(theta > 0.0f)
+		return (theta - PI);
+	else
+		return (theta + PI);
 }
 
 

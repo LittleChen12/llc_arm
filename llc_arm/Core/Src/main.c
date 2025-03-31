@@ -76,7 +76,7 @@ int fputc(int ch,FILE *f)
   * @retval int
   */
 int main(void)
-{
+ {
 
   /* USER CODE BEGIN 1 */
 
