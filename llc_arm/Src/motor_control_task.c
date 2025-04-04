@@ -7,15 +7,16 @@ float acc_test = 0.0f;
 long int tick;
 float time_base;
 uint8_t stop_flag;//抱闸开关用
-
+float theta[6];
 
 Dstp_Motor_Send dstp_motor_send[6];
-float Motor_relay_position[6] = {165.3f,80.0f,-54.5f,3.07f,12.73f,56.0f};//存放电机初始位置
+float Motor_relay_position[6] = {165.5f,79.3f,-54.9f,3.12f,6.44f,56.0f};//存放电机初始位置
 
-float test[6]={-0.448716222*50.0f + 165.3f,-0.449609607*50.0f + 80.0f,-0.450502543*50.0f - 54.5f,-0.4513950*4.0f + 3.07f,-0.4522870*4.0f + 12.73f,-0.4531786*30.0f + 56.0f};//写入电机角度
+float test[6]={-0.448716222*50.0f + 165.5f,-0.449609607*50.0f + 79.3f,-0.450502543*50.0f -54.9f,-0.4513950*4.0f + 3.12f,-0.4522870*4.0f + 6.44f,-0.4531786*30.0f + 56.0f};//写入电机角度
 
 void Motor_Control_start(void *argument)
 {
+
 	matrix_init();
   IK_matrix_init();
 	Control_Relay_Switch(GPIO_PIN_RESET);//关闭所有抱闸开关	
@@ -34,34 +35,10 @@ void Motor_Control_start(void *argument)
 	Relay_Motor(Motor_relay_position);//所有电机复位
 	osDelay(10000);
 
-
-	Trace_run(10,5000);
+	Trace_run(20,10000);//电机插补点越多，减速阶段稳定性越差！！！！
   for(;;)
   {
-		
-//		for(int i=1;i<=6;i++)
-//		{
-//			switch(i){
-//				case 1:
-//				case 2:
-//				case 3:
-//					Read_Actual_Position(i);
-//					motor_theta[i-1]=(Motor[i-1].actual_position - Motor_relay_position[i-1])/50.0f;
-//					break;
-//				case 4:
-//				case 5:
-//					Read_Actual_Position(i);
-//					motor_theta[i-1]=(Motor[i-1].actual_position - Motor_relay_position[i-1])/4.0f;
-//					break;
-//				case 6:
-//					Read_Actual_Position(i);
-//					motor_theta[i-1]=(Motor[i-1].actual_position - Motor_relay_position[i-1])/30.0f;
-//					break;
-//				default:
-//					break;
-//			}
-//		}
-	
+//		IK(position_init,dh_matrix,theta);	
 		
 //		if(stop_flag == 0)//测试代码写在这里面
 //		{
@@ -103,7 +80,6 @@ void Motor_Control_start(void *argument)
 //		{
 //			Motor_Error_Project(&Motor[i]);
 //		}
-		
-		osDelay(1);
+		osDelay(10);
   }
 }

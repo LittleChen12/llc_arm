@@ -11,7 +11,6 @@ function  robot = puma560_robot(base_xyz)
     L(3) = Link([joint_rads(3),d(3),a(3),alpha(3)],'modified','qlim',qlim3);
     L(4) = Link([joint_rads(4),d(4),a(4),alpha(4)],'modified','qlim',qlim4);
     L(5) = Link([joint_rads(5)+(pi/2),d(5),a(5),alpha(5)],'modified','qlim',qlim5);
-    L(5).offset = pi/2;
     L(6) = Link([joint_rads(6),d(6),a(6),alpha(6)],'modified','qlim',qlim6);
       
 

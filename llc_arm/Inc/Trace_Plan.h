@@ -13,7 +13,7 @@
 //自定义函数
 
 //计算出当前时间点规划的位置
-float Linear_trajectory_planning(float current_time,float p0,float pf,float T);
+double Linear_trajectory_planning(double current_time, double p0, double pf, double T);
 
 //整合六个角度当前时间点规划的位置
 void Linear_trajectory_ouput(float current_time,float p_init[16],float p_end[16],float T,float theta_output[6]);
@@ -24,8 +24,8 @@ void Trace_run(float T,int numPoints);
 void trace_test(float current_time);
 
 //自定义变量
-extern float position_init[16];
-extern float position_end[16];
+extern float position_init[6];
+extern float position_end[6];
 
 
 

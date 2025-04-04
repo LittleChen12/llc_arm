@@ -30,4 +30,5 @@ function show_forward(joints)
     out = robot.fkine(joint_rads);
     disp('matlab工具箱正解：')
     disp(out);
+    %robot.teach();
 end

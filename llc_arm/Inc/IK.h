@@ -58,7 +58,6 @@ void calc_wrist_angles(float theta[6],
                        float T0_6[16], float dh_matrix[6][4],
                        float sol1[3], float sol2[3]);
 
-float Theta_Normalization(float theta);
 
 //自定义变量
 extern float T0_6[16];

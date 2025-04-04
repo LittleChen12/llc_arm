@@ -1,4 +1,5 @@
 function execute_solution = IK_algorithm(T0_6, dh)
+
     % 计算四组θ₁, θ₂, θ₃的解
     [sol123_1, sol123_2, sol123_3, sol123_4] = solve_theta123(T0_6, dh);
     
@@ -22,9 +23,26 @@ function execute_solution = IK_algorithm(T0_6, dh)
     % disp('All solutions:');
     % disp(solutions');
 
-    % 默认返回第一组解（可根据需求修改选择逻辑）
-    execute_solution = solutions(:, 1);
-
+    % % 设置每个角度的有效范围（请根据实际情况修改数值）
+    % angle_ranges = [
+    %     min1, max1;
+    %     min2, max2;
+    %     min3, max3;
+    %     min4, max4;
+    %     min5, max5;
+    %     min6, max6;
+    % ];
+    % 
+    % % 初始化逻辑数组，标记每组解是否有效（1×8）
+    % is_valid = true(1, size(solutions, 2));
+    % 
+    % % 检查每个角度是否满足范围要求
+    % for i = 1:size(solutions, 1)
+    %     is_valid = is_valid & (solutions(i, :) >= angle_ranges(i, 1)) & (solutions(i, :) <= angle_ranges(i, 2));
+    % end
+    % 
+    % execute_solution = solutions(:, is_valid);
+    execute_solution = solutions(:,1);
 end
 
 
@@ -73,9 +91,11 @@ function [sol1, sol2, sol3, sol4] = solve_theta123(T0_6, dh)
     % 用来消除 a1 与 d1 对位置的影响
     X = R_x - dh.a1;
     Z = z - dh.d1;
+ 
     
     % 辅助变量 D 利用余弦定律计算（D = cos(角D)）
     D = (dh.a2^2 + L^2 - (Z^2 + X^2)) / (2 * dh.a2 * L);
+  
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% 第一组解（肘上构型1）
@@ -94,16 +114,16 @@ function [sol1, sol2, sol3, sol4] = solve_theta123(T0_6, dh)
     % 对 X 加上 2*a1，得到 X_（消除额外的 a1 偏移）
     X_ = X + 2 * dh.a1;
     D_ = (dh.a2^2 + L^2 - (Z^2 + X_^2)) / (2 * dh.a2 * L);
-    
-    % 第三组解（肘上构型2）
-    theta1_sol_3 = theta1_sol_1 - 2 * acos((dh.d2 + dh.d3) / sqrt(x^2 + y^2));
-    theta2_sol_3 = -( atan2(X_, Z) - atan2( L * sqrt(1 - D_^2), dh.a2 - L * D_) ) ;
-    theta3_sol_3 = -( pi - ( acos(D_) - atan2(dh.d4, dh.a3) ) ) ;
-    
-    % 第四组解（肘下构型2）
-    theta1_sol_4 = theta1_sol_3;
-    theta2_sol_4 = -( atan2(X_, Z) + atan2( L * sqrt(1 - D_^2), dh.a2 - L * D_) ) ;
-    theta3_sol_4 = pi - acos(D_) - atan2(dh.d4, dh.a3) ;
+
+    % % 第三组解（肘上构型2）
+    % theta1_sol_3 = theta1_sol_1 - 2 * acos((dh.d2 + dh.d3) / sqrt(x^2 + y^2));
+    % theta2_sol_3 = -( atan2(X_, Z) - atan2( L * sqrt(1 - D_^2), dh.a2 - L * D_) ) ;
+    % theta3_sol_3 = -( pi - ( acos(D_) - atan2(dh.d4, dh.a3) ) ) ;
+    % 
+    % % 第四组解（肘下构型2）
+    % theta1_sol_4 = theta1_sol_3;
+    % theta2_sol_4 = -( atan2(X_, Z) + atan2( L * sqrt(1 - D_^2), dh.a2 - L * D_) ) ;
+    % theta3_sol_4 = pi - acos(D_) - atan2(dh.d4, dh.a3) ;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % fprintf('\n【第一组姿态】\n  theta1 = %.6f rad\n  theta2 = %.6f rad\n  theta3 = %.6f rad\n',...
@@ -119,8 +139,8 @@ function [sol1, sol2, sol3, sol4] = solve_theta123(T0_6, dh)
     %% 输出四组解，每组解为列向量 [θ1; θ2; θ3]
     sol1 = [theta1_sol_1; theta2_sol_1; theta3_sol_1];
     sol2 = [theta1_sol_2; theta2_sol_2; theta3_sol_2];
-    sol3 = [theta1_sol_3; theta2_sol_3; theta3_sol_3];
-    sol4 = [theta1_sol_4; theta2_sol_4; theta3_sol_4];
+    sol3 = [0; 0; 0];
+    sol4 = [0; 0; 0];
 end
 
 
@@ -154,38 +174,48 @@ function [sol1, sol2] = calc_wrist_angles(theta1, theta2, theta3, T0_6, dh)
     R0_6 = T0_6(1:3, 1:3);
     R_end = transpose(R0_E) * R0_6;%此处得到的是6号坐标系在4号坐标系下的表示
     
-    %% 利用标准 Z–Y–Z 分解提取腕部角度（非奇异情况）
-    sol1_beta = atan2( sqrt(R_end(3,1)^2 + R_end(3,2)^2) , R_end(3,3));
-    if sol1_beta ~=0 && sol1_beta ~= pi
-        sol1_alpha = atan2( (R_end(2,3)/sin(sol1_beta)) , (R_end(1,3)/sin(sol1_beta)) );
-        sol1_gamma = atan2( R_end(3,2)/sin(sol1_beta) , -R_end(3,1)/sin(sol1_beta) );
-    elseif sol1_beta == 0
+    %% 利用标准 Z–Y–Z 分解提取腕部角度
+% R_total = 
+% [cos(alpha)*cos(beta)*cos(gamma) - sin(alpha)*sin(gamma), - cos(gamma)*sin(alpha) - cos(alpha)*cos(beta)*sin(gamma), cos(alpha)*sin(beta)]
+% [cos(alpha)*sin(gamma) + cos(beta)*cos(gamma)*sin(alpha),   cos(alpha)*cos(gamma) - cos(beta)*sin(alpha)*sin(gamma), sin(alpha)*sin(beta)]
+% [                                -1*cos(gamma)*sin(beta),                                      sin(beta)*sin(gamma),            cos(beta)]
+
+    sol1_beta = atan2( sqrt(R_end(3,1)^2 + R_end(3,2)^2) , R_end(3,3));%由于第一部分非负，所以角度范围为0到pi，0和pi均可取，
+    tol = 1e-6;%由于0和pi都是奇异情况，真实情况下，很难说绝对的0和pi，计算都有误差，所以在这里取了一个区间。
+    if abs(sol1_beta) > tol && abs(sol1_beta - pi) > tol
+        sol1_alpha = atan2( R_end(2,3)/sin(sol1_beta), R_end(1,3)/sin(sol1_beta));%除以sin(sol1_beta)是为了消除sin(sol1_beta)的影响！！
+        sol1_gamma = atan2( R_end(3,2)/sin(sol1_beta), -R_end(3,1)/sin(sol1_beta) );%除以sin(sol1_beta)是为了消除sin(sol1_beta)的影响
+    elseif abs(sol1_beta) <= tol   % 当 beta 充分接近 0 时 奇异情况（但是是针对特殊的初始位置），出现奇异解的时候，直接让sol1_alpha为0，求解sol1_gamma。（本质上也可以让sol1_gamma为0，求解sol1_alpha）
         sol1_alpha = 0;
-        sol1_gamma = atan2(-R_end(1,2),R_end(1,1));
-    elseif sol1_beta == pi
+        sol1_gamma = atan2(-R_end(1,2), R_end(1,1));
+    elseif abs(sol1_beta - pi) <= tol  % 当 beta 充分接近 pi 时 奇异情况（但是是针对特殊的初始位置）
         sol1_alpha = 0;
-        sol1_gamma = atan2(R_end(1,2),-R_end(1,1));        
+        sol1_gamma = atan2(R_end(1,2), -R_end(1,1));        
     end
-    %% 第一组解
-    if sol1_alpha>0
-        sol1_theta4 = sol1_alpha - pi;
-    end
-    if sol1_alpha<=0
-        sol1_theta4 = pi + sol1_alpha;        
-    end
-    sol1_theta5 = sol1_beta - pi/2;
-    if sol1_gamma>0
-        sol1_theta6 = sol1_gamma - pi;
-    end
-    if sol1_gamma<=0
-        sol1_theta6 = pi + sol1_gamma;        
-    end
+
+    % sol1_theta4 = sol1_alpha - pi;%我们知道，由于ZYZ的解法 sol1_theta4 = sol1_alpha - pi；所以实际上4角的范围是-2pi到0
+    % sol1_theta5 = sol1_beta;%我们知道，由于ZYZ的解法 sol1_theta5 = sol1_beta；所以实际上5角就是sol1_beta
+    % sol1_theta6 = sol1_gamma - pi;%我们知道，由于ZYZ的解法 sol1_theta6 = sol1_gamma - pi；所以实际上6角的范围是-2pi到0
+        % 修改后：将角度包装到 [-pi, pi]
+        % 使用单片机实现的时候用fmodf即可
+        % float wrapToPi_f32(float angle) {
+        %     float two_pi = 2.0f * PI;  // 注意确保 PI 已正确定义
+        %     // 先将角度加上 PI，然后使用 fmodf 取模
+        %     angle = fmodf(angle + PI, two_pi);
+        %     if (angle < 0)
+        %         angle += two_pi;//这儿是因为需要取正模，matlab中的mod已经有取正模，但是单片机中没有
+        %     return angle - PI;
+        % }
+    sol1_theta4 = mod(sol1_alpha - pi + pi, 2*pi) - pi;%注意：sol1_alpha - pi是原先的sol1_theta4，平移pi后
+    sol1_theta5 = sol1_beta;  % 已经是[0,pi]
+    sol1_theta6 = mod(sol1_gamma - pi + pi, 2*pi) - pi;
+
     sol1 = [sol1_theta4; sol1_theta5; sol1_theta6];
     
     %% 第二组解
-    sol2_theta4 = sol1_theta4 + pi;
-    sol2_theta5 = -sol1_beta - pi/2;%5角比较特殊
-    sol2_theta6 = sol1_theta6 + pi;
+    sol2_theta4 = sol1_alpha;%由于第二组解，本来就是sol1_theta4加pi，所以取值空间为-pi到pi
+    sol2_theta5 = -sol1_beta;%第二组解的取值空间在-pi到0
+    sol2_theta6 = sol1_gamma;%由于第二组解，本来就是sol1_theta6加pi，所以取值空间为-pi到pi
     sol2 = [sol2_theta4; sol2_theta5; sol2_theta6];
 
     % %显示 

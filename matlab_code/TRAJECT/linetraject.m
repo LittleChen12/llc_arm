@@ -2,6 +2,7 @@ function [pos, vel, acc, timeVec] = linetraject(p0,pf,T,numPoints)
     tacc = 0.1*T;
     v_mid = (pf - p0)/T;
     timeVec = linspace(0, T, numPoints)';  % 时间向量
+    % disp(timeVec);
     a0 = (0.5*(v_mid*T^4 - 2*v_mid*T^3*tacc + 2*v_mid*T*tacc^3 - v_mid*tacc^4 + 2*p0*tacc^3))/tacc^3;
     a1 = -(2*v_mid*T^3 - 3*tacc*v_mid*T^2)/tacc^3;
     a2 = (3*(v_mid*T^2 - tacc*v_mid*T))/tacc^3;

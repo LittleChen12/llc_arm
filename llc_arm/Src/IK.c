@@ -148,12 +148,12 @@ void solve_theta123(float T0_6[16], float dh_matrix[6][4],
     float Z = z - d1;
     
     // 辅助变量 D，依据余弦定律计算（D = cos(D_angle)）
-    float D = (a2*a2 + L*L - (Z*Z + X*X)) / (2 * a2 * L);
+    float D = (a2*a2 + L*L - (Z*Z + X*X)) / (2.0f * a2 * L);
     
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // 第一组解（肘上构型1）
-    float theta2_sol_1 = PI/2 - atan2(Z, X) - atan2( L * sqrt(1 - D*D), a2 - L*D );
-    float theta3_sol_1 = -( acos(D) - atan2(a3, d4) - PI/2 );
+    float theta2_sol_1 = PI/2.0f - atan2(Z, X) - atan2( L * sqrt(1 - D*D), a2 - L*D );
+    float theta3_sol_1 = -( acos(D) - atan2(a3, d4) - PI/2.0f );
     float theta1_sol_1 = atan2(y, x) - asin(sum_d2d3 / sqrt(x*x + y*y));
     
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -162,21 +162,29 @@ void solve_theta123(float T0_6[16], float dh_matrix[6][4],
     float theta3_sol_2 = -( PI - ( acos(D) - atan2(d4, a3) ) );
     float theta1_sol_2 = theta1_sol_1;
     
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    // 为计算第三、第四组解构造新的中间量
-    float X_ = X + 2 * a1;  // 新的 X
-    float D_ = (a2*a2 + L*L - (Z*Z + X_*X_)) / (2 * a2 * L);
+//    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//    // 为计算第三、第四组解构造新的中间量
+//    float X_ = X + 2 * a1;  // 新的 X
+//    float D_ = (a2*a2 + L*L - (Z*Z + X_*X_)) / (2 * a2 * L);
+//    
+//    // 第三组解（肘上构型2）
+//    float theta1_sol_3 = theta1_sol_1 - 2 * acos((d2 + d3) / sqrt(x*x + y*y));
+//    float theta2_sol_3 = -( atan2(X_, Z) - atan2( L * sqrt(1 - D_*D_), a2 - L*D_ ) );
+//    float theta3_sol_3 = -( PI - ( acos(D_) - atan2(d4, a3) ) );
+//    
+//    // 第四组解（肘下构型2）
+//    float theta1_sol_4 = theta1_sol_3;
+//    float theta2_sol_4 = -( atan2(X_, Z) + atan2( L * sqrt(1 - D_*D_), a2 - L*D_ ) );
+//    float theta3_sol_4 = PI - acos(D_) - atan2(d4, a3);
     
-    // 第三组解（肘上构型2）
-    float theta1_sol_3 = theta1_sol_1 - 2 * acos((d2 + d3) / sqrt(x*x + y*y));
-    float theta2_sol_3 = -( atan2(X_, Z) - atan2( L * sqrt(1 - D_*D_), a2 - L*D_ ) );
-    float theta3_sol_3 = -( PI - ( acos(D_) - atan2(d4, a3) ) );
-    
-    // 第四组解（肘下构型2）
-    float theta1_sol_4 = theta1_sol_3;
-    float theta2_sol_4 = -( atan2(X_, Z) + atan2( L * sqrt(1 - D_*D_), a2 - L*D_ ) );
-    float theta3_sol_4 = PI - acos(D_) - atan2(d4, a3);
-    
+		float theta1_sol_3 = 0;
+		float theta2_sol_3 = 0;
+		float theta3_sol_3 = 0;
+		
+		float theta1_sol_4 = 0;
+		float theta2_sol_4 = 0;
+		float theta3_sol_4 = 0;
+		
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // 将四组解写入输出数组（每组解为 {θ1, θ2, θ3}）
     sol1[0] = theta1_sol_1;
@@ -194,6 +202,20 @@ void solve_theta123(float T0_6[16], float dh_matrix[6][4],
     sol4[0] = theta1_sol_4;
     sol4[1] = theta2_sol_4;
     sol4[2] = theta3_sol_4;
+}
+
+/*
+ * 函数: wrapToPi_f32
+ * 归一化
+*/
+
+float wrapToPi_f32(float angle) {
+		float two_pi = 2.0f * PI;  // 注意确保 PI 已正确定义
+		// 先将角度加上 PI，然后使用 fmodf 取模
+		angle = fmodf(angle + PI, two_pi);
+		if (angle < 0)
+				angle += two_pi;//这儿是因为需要取正模，matlab中的mod已经有取正模，但是单片机中没有
+		return angle - PI;
 }
 
 /*
@@ -270,24 +292,25 @@ void calc_wrist_angles(float theta[6],
 		double sol1_alpha;
 		
 		sol1_beta = atan2( sqrt(pow(R_end[6],2) + pow(R_end[7],2)) , R_end[8]);
-		if (sol1_beta != 0 && sol1_beta != PI) {
+		const float tol = 1e-6;
+		if ( fabs(sol1_beta) > tol && fabs(sol1_beta - PI) > tol) {
         sol1_alpha = atan2f( (R_end[5]/ sinf(sol1_beta)) , (R_end[2]/ sinf(sol1_beta)) );
         sol1_gamma = atan2f( (R_end[7]/ sinf(sol1_beta)) , (-R_end[6]/ sinf(sol1_beta)) );
     }
-    else if (sol1_beta == 0) {
+    else if (fabs(sol1_beta) <= tol) {
         sol1_alpha = 0;
         sol1_gamma = atan2f( -R_end[1], R_end[0] );
     }
-    else if (sol1_beta == PI) {
+    else if (fabs(sol1_beta - PI) <= tol) {
         sol1_alpha = 0;
         sol1_gamma = atan2f( R_end[1], -R_end[0] );
     }
 		
 
     // 第一组腕部解
-    float sol1_theta4 = Theta_Normalization(sol1_alpha);
-    float sol1_theta5 = sol1_beta - (PI / 2);
-    float sol1_theta6 = Theta_Normalization(sol1_gamma);
+    float sol1_theta4 = wrapToPi_f32(sol1_alpha - PI);
+    float sol1_theta5 = sol1_beta;
+    float sol1_theta6 = wrapToPi_f32(sol1_gamma - PI);
 		
 			
     sol1[0] = sol1_theta4;
@@ -295,9 +318,9 @@ void calc_wrist_angles(float theta[6],
     sol1[2] = sol1_theta6;
     
     // 第二组腕部解
-    float sol2_theta4 = sol1_theta4 + PI;
-    float sol2_theta5 = - sol1_beta - PI/2;
-    float sol2_theta6 = sol1_theta6 + PI;
+    float sol2_theta4 = sol1_alpha;
+    float sol2_theta5 = - sol1_beta;
+    float sol2_theta6 = sol1_gamma;
 		
 		
     sol2[0] = sol2_theta4;
@@ -346,12 +369,5 @@ void Assign_theta123456(void)
     }
 }
 
-float Theta_Normalization(float theta)
-{
-	if(theta > 0.0f)
-		return (theta - PI);
-	else
-		return (theta + PI);
-}
 
 
