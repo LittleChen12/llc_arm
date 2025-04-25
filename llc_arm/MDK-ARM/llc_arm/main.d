@@ -50,6 +50,7 @@ llc_arm\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
 llc_arm\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
 llc_arm\main.o: ../Core/Inc/fdcan.h
 llc_arm\main.o: ../Core/Inc/memorymap.h
+llc_arm\main.o: ../Core/Inc/tim.h
 llc_arm\main.o: ../Core/Inc/usart.h
 llc_arm\main.o: ../Core/Inc/gpio.h
 llc_arm\main.o: ../BSP/Inc_bsp/fdcan_fliter.h

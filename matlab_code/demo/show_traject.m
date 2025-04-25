@@ -28,7 +28,7 @@ function show_traject(x_init,y_init,z_init,alpha_init,beta_init,gamma_init,...
     disp("end");
     disp(position_end);
     for i = 1:6
-        [stage(i,:),~,~,T_BASE] = linetraject(position_init(i) , position_end(i) , T_TIME , num);
+        [stage(i,:),~,~,T_BASE] = linetraject(position_init(i) , position_end(i) , T_TIME , num,0.5);
     end
     disp(stage);
 
@@ -60,8 +60,8 @@ function show_traject(x_init,y_init,z_init,alpha_init,beta_init,gamma_init,...
         theta123456_output(i,:) = IK_algorithm(T_mid, dh);
         
         % 输出结果到命令行
-        disp(theta123456_output(i,:));
-        disp(i);
+        % disp(theta123456_output(i,:));
+        % disp(i);
     end
 
     % labels 对应 theta1,theta2,theta3,theta4,theta5,theta6

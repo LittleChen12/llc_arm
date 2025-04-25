@@ -61,6 +61,12 @@ void Error_Handler(void);
 #define KEY2_GPIO_Port GPIOC
 #define KEY1_Pin GPIO_PIN_0
 #define KEY1_GPIO_Port GPIOA
+#define ADC0_Pin GPIO_PIN_0
+#define ADC0_GPIO_Port GPIOB
+#define ADC1_Pin GPIO_PIN_1
+#define ADC1_GPIO_Port GPIOB
+#define ADC2_Pin GPIO_PIN_2
+#define ADC2_GPIO_Port GPIOB
 #define LED_Pin GPIO_PIN_7
 #define LED_GPIO_Port GPIOE
 #define Relay_Switch_Pin GPIO_PIN_8
@@ -77,6 +83,28 @@ void Error_Handler(void);
 #define Limit_Switch_5_GPIO_Port GPIOE
 #define Limit_Switch_6_Pin GPIO_PIN_14
 #define Limit_Switch_6_GPIO_Port GPIOE
+#define ADC10_Pin GPIO_PIN_10
+#define ADC10_GPIO_Port GPIOB
+#define ADC11_Pin GPIO_PIN_14
+#define ADC11_GPIO_Port GPIOB
+#define ADC12_Pin GPIO_PIN_15
+#define ADC12_GPIO_Port GPIOB
+#define ADC13_Pin GPIO_PIN_8
+#define ADC13_GPIO_Port GPIOD
+#define ADC3_Pin GPIO_PIN_3
+#define ADC3_GPIO_Port GPIOB
+#define ADC4_Pin GPIO_PIN_4
+#define ADC4_GPIO_Port GPIOB
+#define ADC5_Pin GPIO_PIN_5
+#define ADC5_GPIO_Port GPIOB
+#define ADC6_Pin GPIO_PIN_6
+#define ADC6_GPIO_Port GPIOB
+#define ADC7_Pin GPIO_PIN_7
+#define ADC7_GPIO_Port GPIOB
+#define ADC8_Pin GPIO_PIN_8
+#define ADC8_GPIO_Port GPIOB
+#define ADC9_Pin GPIO_PIN_9
+#define ADC9_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

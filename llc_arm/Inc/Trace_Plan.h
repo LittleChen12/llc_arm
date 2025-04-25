@@ -7,8 +7,9 @@
 #include "dstp_motor.h"
 #include "cmsis_os.h"
 #include "controler.h"
-
-
+#include "fdcan_fliter.h"
+#include "led_task.h"
+#include "Read_adc.h"
 
 //自定义函数
 
@@ -16,20 +17,12 @@
 double Linear_trajectory_planning(double current_time, double p0, double pf, double T);
 
 //整合六个角度当前时间点规划的位置
-void Linear_trajectory_ouput(float current_time,float p_init[16],float p_end[16],float T,float theta_output[6]);
+void Linear_trajectory_ouput(float current_time,float p_init[6],float p_end[6],float T,float theta_output[6],float a);
 
 //开始执行轨迹
-void Trace_run(float T,int numPoints);
-
-void trace_test(float current_time);
+uint8_t Trace_run(float position_init[6],float position_end[6],float T_total,float a);
 
 //自定义变量
-extern float position_init[6];
-extern float position_end[6];
-
-
-
-
 
 
 

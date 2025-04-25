@@ -1,9 +1,8 @@
 #include "Trace_Plan.h"
 
-float position_init[6] = {0.2450f,0.3f,0.2572f,-PI,0,0};
-float position_end[6] = {0.2450f,-0.3f,0.2572f,-PI,0,0 };
 float theta123456_output[6];
 float theta123456_output_end[6];
+
 
 //计算出当前时间点规划的位置
 uint8_t count_tick = 0;
@@ -25,7 +24,7 @@ double Linear_trajectory_planning(double current_time, double p0, double pf, dou
         last_T = T;
         
         // 计算加速时间（10% 的总时间）
-        tacc = 0.1 * T;
+        tacc = 0.01 * T;
         // 计算匀速阶段的平均速度
         v_mid = (pf - p0) / T;
         
@@ -79,8 +78,77 @@ double Linear_trajectory_planning(double current_time, double p0, double pf, dou
     return output;
 }
 
+// 计算直线轨迹，输出位置、速度、加速度以及时间向量
+// 参数：
+//   p0      —— 初始位置
+//   pf      —— 终止位置
+//   tf      —— 总运动时间
+//   a       —— 指定加速度参数（正值代表加速运动，负值代表减速运动）
 
+double Linear_trajectory_planning_1(double current_time, double p0, double pf, double tf,double a)
+{
+    // 使用静态变量保存上一组参数以及预计算参数，避免重复计算
+    static int initialized = 0;
+    static double last_p0, last_pf, last_tf, last_a;
+    static double tb;  // 分段切换时间点
+    double a_temp = a;
+    double tb1, tb2;
 
+    // 如果参数发生变化或首次调用，则重新计算 tb（转折点时间）
+    if (!initialized || p0 != last_p0 || pf != last_pf || tf != last_tf || a != last_a) {
+        initialized = 1;
+        last_p0 = p0; 
+        last_pf = pf; 
+        last_tf = tf;
+        last_a = a;
+
+        if (p0 > pf) { // 运动为减速过程：将加速度处理成负值
+            a_temp = -fabs(a_temp);
+            // MATLAB 代码中条件判断为：if a > (4*(pf - p0)/(tf^2)) 则 a = (4*(pf - p0)/(tf^2))
+            if (a_temp > (4 * (pf - p0) / (tf * tf))) {
+                a_temp = 4 * (pf - p0) / (tf * tf);
+            }
+            double discr = a_temp * (a_temp * tf * tf + 4 * p0 - 4 * pf);
+            if (discr < 0) discr = 0; // 避免 sqrt 负值
+            double sqrt_val = sqrt(discr);
+            tb1 = (0.5 * a_temp * tf - 0.5 * sqrt_val) / a_temp;
+            tb2 = (0.5 * a_temp * tf + 0.5 * sqrt_val) / a_temp;
+            tb = (tb1 <= tb2 ? tb1 : tb2);
+        } else { // p0 <= pf，加速过程
+            a_temp = fabs(a_temp);
+            // MATLAB 代码中条件判断为：if a < (4*(pf - p0)/(tf^2)) 则 a = (4*(pf - p0)/(tf^2))
+            if (a_temp < (4 * (pf - p0) / (tf * tf))) {
+                a_temp = 4 * (pf - p0) / (tf * tf);
+            }
+            double discr = a_temp * (a_temp * tf * tf + 4 * p0 - 4 * pf);
+            if (discr < 0) discr = 0;
+            double sqrt_val = sqrt(discr);
+            tb1 = (0.5 * a_temp * tf - 0.5 * sqrt_val) / a_temp;
+            tb2 = (0.5 * a_temp * tf + 0.5 * sqrt_val) / a_temp;
+            tb = (tb1 <= tb2 ? tb1 : tb2);
+        }
+    }
+
+    // 对每个时刻 t，根据运动阶段计算位置、速度、加速度
+    // 三段规划如下：
+    // 1. 加速阶段：t <= tb
+    // 2. 匀速阶段：tb < t <= (tf-tb)
+    // 3. 减速阶段：t > (tf-tb)
+        if (current_time <= tb) 
+				{
+            output = p0 + 0.5 * a_temp * current_time * current_time;
+         } 
+				else if (current_time > tb && current_time <= (tf - tb)) 
+				{
+//            output = p0 + 0.5 * a_temp * tb * tb + a_temp * tb * (current_time - tb);化简后
+							output = p0 + a_temp * tb * (current_time - 0.5*tb);
+         } 
+				else 
+				{
+							output = p0 + a_temp * tb * (tf - tb) - 0.5 * a_temp * (current_time - tf) * (current_time - tf);
+         }
+				return output;
+}
 
 
 double Positon_output[6];
@@ -88,12 +156,12 @@ float alpha,beta,gamma;
 float temp_matrix[16];
 float temp_IK_theta[6]={0};
 //调用一次，输出一组123456角度
-void Linear_trajectory_ouput(float current_time,float p_init[6],float p_end[6],float T,float theta_output[6])
+void Linear_trajectory_ouput(float current_time,float p_init[6],float p_end[6],float T,float theta_output[6],float a)
 {
-	//调用直线轨迹规划函数
+//调用直线轨迹规划函数
 	for(int i=0;i<6;i++)
 	{
-		Positon_output[i] = Linear_trajectory_planning(current_time,p_init[i],p_end[i],T);
+		Positon_output[i] = Linear_trajectory_planning_1(current_time,p_init[i],p_end[i],T,a);
 	}
 	
 	alpha = Positon_output[3];
@@ -134,19 +202,29 @@ void Linear_trajectory_ouput(float current_time,float p_init[6],float p_end[6],f
 	
 }
 
-float flag=0;
-//开始执行轨迹(T(s)/numPoints=2ms)
-void Trace_run(float T,int numPoints)
+uint8_t finsh_step_flag;
+float Pos_INIT_REAL[6];
+float Pos_END_REAL[6];
+double kp,delt,p_out; 
+long int tick_pid;
+float adc_date;
+//开始执行轨迹(T(s)/numPoints=2ms) 固定速度0.01m/s
+uint8_t Trace_run(float position_init[6],float position_end[6],float T_total,float a)
 {
-	//初始化开始时间
-	float current_time = 0;
+	float current_time;	int numPoints; uint8_t finsh_flag;//轨迹完成标准位
+	
+	// 使用 ceil 函数实现向上取整
+	numPoints = T_total/0.002f;
+	numPoints = ceil(numPoints);
 	
 	//走到第一个点
-	Linear_trajectory_ouput(current_time,position_init ,position_end,T,theta123456_output);
+	Linear_trajectory_ouput(current_time,position_init ,position_end,T_total,theta123456_output,a);
+	
+	memcpy(real_motor_theta,theta123456_output,sizeof(theta123456_output));
 	
 	theta123456_output_end[0] = theta123456_output[0] * 50.0f + 165.5f;
-	theta123456_output_end[1] = theta123456_output[1] * 50.0f + 79.3f;
-	theta123456_output_end[2] = theta123456_output[2] * 50.0f - 54.9f;
+	theta123456_output_end[1] = theta123456_output[1] * 50.0f + 78.95f;
+	theta123456_output_end[2] = theta123456_output[2] * 50.0f - 54.55f;
 	theta123456_output_end[3] = theta123456_output[3] * 4.0f + 3.12f;
 	theta123456_output_end[4] = theta123456_output[4] * 4.0f + 6.44f;
 	theta123456_output_end[5] = theta123456_output[5] * 30.0f + 56.0f;
@@ -158,7 +236,27 @@ void Trace_run(float T,int numPoints)
 		Contour_Position_Mode(i,0,0,theta123456_output_end[i-1]);
 		osDelay(10);
 	}
-	osDelay(10000);
+	while(1)
+	{
+		for(uint8_t i = 1;i<=6;i++)
+		{
+			Read_Actual_Position(i);
+			osDelay(10);
+		}
+		finsh_step_flag = 0;
+		for(uint8_t i = 0;i<6;i++)
+		{
+			if(fabs(Motor[i].actual_position - theta123456_output_end[i]) < 0.001f)
+			{
+				finsh_step_flag++;
+			}
+		}
+		if(finsh_step_flag == 6)
+		{
+			break;
+		}
+	}
+	osDelay(500);
 	
 	for(int i=1;i<=6;i++)
 	{
@@ -171,13 +269,30 @@ void Trace_run(float T,int numPoints)
 	// 将 2ms 转换为系统 tick 数
 	const TickType_t xFrequency = pdMS_TO_TICKS(2);
 	//再开始走轨迹
-	for(int i=0;i<=numPoints;i++)
+	for(long int i=0;i<=numPoints;i++)
 	{
-				flag++;
-		Linear_trajectory_ouput(current_time,position_init ,position_end,T,theta123456_output);
+		memcpy(Pos_INIT_REAL,position_init,sizeof(Pos_INIT_REAL));
+		memcpy(Pos_END_REAL,position_end,sizeof(Pos_END_REAL));
+//		if(tick_pid == 500)
+//		{
+//			tick_pid = 0;
+//			kp = 0.000005f;
+//			delt = Draw_data - 1300.0f;
+//			p_out = kp * delt;
+//			if(p_out > 0.0005f)
+//			{
+//				p_out = 0.0005f;
+//			}
+//			if(p_out < -0.0005f)
+//			{
+//				p_out = -0.0005f;		
+//			}
+//		}
+//		Pos_END_REAL[2] = Pos_END_REAL[2] + p_out;
+		Linear_trajectory_ouput(current_time,Pos_INIT_REAL ,Pos_END_REAL,T_total,theta123456_output,a);
 		theta123456_output_end[0] = theta123456_output[0] * 50.0f + 165.5f;
-		theta123456_output_end[1] = theta123456_output[1] * 50.0f + 79.3f;
-		theta123456_output_end[2] = theta123456_output[2] * 50.0f - 54.9f;
+		theta123456_output_end[1] = theta123456_output[1] * 50.0f + 78.95f;
+		theta123456_output_end[2] = theta123456_output[2] * 50.0f - 54.55f;
 		theta123456_output_end[3] = theta123456_output[3] * 4.0f + 3.12f;
 		theta123456_output_end[4] = theta123456_output[4] * 4.0f + 6.44f;
 		theta123456_output_end[5] = theta123456_output[5] * 30.0f + 56.0f;
@@ -186,17 +301,22 @@ void Trace_run(float T,int numPoints)
 		{
 			Follow_Position_Mode(j,0,1,theta123456_output_end[j-1]);
 		}
-		Multi_Axis_Synchronization();
+		Multi_Axis_Synchronization();		
+		if(tick_pid > 5)
+		{
+			tick_pid = 0;
+			adc_date = Read_ADC_Data();
+			printf("x:%.6f,y:%.6f,adc:%.6f\r\n",Positon_output[0],Positon_output[1],adc_date);
+		}
 		current_time += 0.002f;
+		tick_pid++;
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
-  } 
+  }
+	finsh_flag = 1;
+	return finsh_flag;
 	
 }
 
-void trace_test(float current_time)
-{
-	Linear_trajectory_ouput(current_time,position_init,position_end,10,theta123456_output);
-}
 
 
 

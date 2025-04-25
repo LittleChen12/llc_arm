@@ -21,6 +21,7 @@
 #include "cmsis_os.h"
 #include "fdcan.h"
 #include "memorymap.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -66,7 +67,7 @@ void MX_FREERTOS_Init(void);
 //串口重定义
 int fputc(int ch,FILE *f)
 {
-    HAL_UART_Transmit(&huart3,(uint8_t *)&ch,1,100);     
+    HAL_UART_Transmit(&huart1,(uint8_t *)&ch,1,100);     
     return 0;
 }
 /* USER CODE END 0 */
@@ -76,7 +77,7 @@ int fputc(int ch,FILE *f)
   * @retval int
   */
 int main(void)
-  {
+{
 
   /* USER CODE BEGIN 1 */
 
@@ -104,9 +105,11 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_FDCAN1_Init();
-  MX_USART3_UART_Init();
+  MX_TIM2_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 	FDCAN_Filter_Config();
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
   /* USER CODE END 2 */
 
   /* Init scheduler */

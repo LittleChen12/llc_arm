@@ -61,3 +61,8 @@ llc_arm\motor_control_task.o: D:\KEIL\ARM\ARMCC\Bin\..\include\float.h
 llc_arm\motor_control_task.o: D:\KEIL\ARM\ARMCC\Bin\..\include\limits.h
 llc_arm\motor_control_task.o: ../Inc/IK.h
 llc_arm\motor_control_task.o: ../Inc/Trace_Plan.h
+llc_arm\motor_control_task.o: ../Inc/led_task.h
+llc_arm\motor_control_task.o: ../Inc/Trace_Plan.h
+llc_arm\motor_control_task.o: D:\KEIL\ARM\ARMCC\Bin\..\include\stdbool.h
+llc_arm\motor_control_task.o: D:\KEIL\ARM\ARMCC\Bin\..\include\stdlib.h
+llc_arm\motor_control_task.o: ../Inc/Read_adc.h

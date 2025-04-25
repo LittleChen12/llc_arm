@@ -58,3 +58,9 @@ llc_arm\trace_plan.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wra
 llc_arm\trace_plan.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
 llc_arm\trace_plan.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
 llc_arm\trace_plan.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
+llc_arm\trace_plan.o: ../BSP/Inc_bsp/fdcan_fliter.h
+llc_arm\trace_plan.o: ../Inc/led_task.h
+llc_arm\trace_plan.o: ../Inc/Trace_Plan.h
+llc_arm\trace_plan.o: D:\KEIL\ARM\ARMCC\Bin\..\include\stdbool.h
+llc_arm\trace_plan.o: D:\KEIL\ARM\ARMCC\Bin\..\include\stdlib.h
+llc_arm\trace_plan.o: ../Inc/Read_adc.h

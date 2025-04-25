@@ -5,6 +5,7 @@
 "llc_arm\freertos.o"
 "llc_arm\fdcan.o"
 "llc_arm\memorymap.o"
+"llc_arm\tim.o"
 "llc_arm\usart.o"
 "llc_arm\stm32h7xx_it.o"
 "llc_arm\stm32h7xx_hal_msp.o"
@@ -50,6 +51,7 @@
 "llc_arm\controler.o"
 "llc_arm\ik.o"
 "llc_arm\trace_plan.o"
+"llc_arm\read_adc.o"
 --library_type=microlib --strict --scatter "llc_arm\llc_arm.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
